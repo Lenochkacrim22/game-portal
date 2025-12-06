@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Elena's games</title>
+  <style>
+    :root {
+      --dark-overlay: rgba(16, 0, 32, 0.85);
+      --neon-blue: #00ffff;
+      --neon-purple: #9933ff;
+      --text-color: #f0f0f0;
+      --glow: 0 0 10px var(--neon-blue), 0 0 20px rgba(0, 255, 255, 0.5);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: url('images/3.jpg') center/cover no-repeat fixed;
+      color: var(--text-color);
+      font-family: 'Consolas', monospace, sans-serif;
+      font-size: 18px;
+      line-height: 1.6;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--dark-overlay);
+      z-index: -1;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2.5rem 1rem 4rem;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 3.2rem;
+      text-transform: uppercase;
+      letter-spacing: 5px;
+      margin-bottom: 3.5rem;
+      color: var(--neon-blue);
+      text-shadow: var(--glow);
+      font-weight: normal;
+    }
+
+    .section {
+      margin-bottom: 4rem;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.8rem;
+      text-align: left;
+    }
+
+    .section-title-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .section-image {
+      height: 100px;
+      width: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 0 6px rgba(153, 51, 255, 0.6));
+    }
+
+    .section-title {
+      font-size: 1.8rem;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      color: var(--neon-purple);
+      text-shadow: 0 0 8px rgba(153, 51, 255, 0.5);
+      font-weight: normal;
+      margin: 0;
+      position: relative;
+    }
+
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: var(--neon-blue);
+    }
+
+    .carousel-nav {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .nav-btn {
+      background: transparent;
+      color: var(--neon-blue);
+      border: 2px solid var(--neon-blue);
+      font-family: 'Consolas', monospace;
+      font-size: 1.3rem;
+      width: 44px;
+      height: 44px;
+      cursor: pointer;
+      padding: 0;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      transition: all 0.2s;
+    }
+
+    .nav-btn:hover,
+    .nav-btn:focus {
+      background: rgba(0, 255, 255, 0.15);
+      color: #100020;
+      outline: none;
+    }
+
+    .carousel {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+      gap: 1.2rem;
+      padding: 0.8rem 0;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .carousel::-webkit-scrollbar {
+      display: none;
+    }
+
+    .carousel {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    .card {
+      flex: 0 0 auto;
+      scroll-snap-align: start;
+      width: 180px;
+      height: 180px;
+      background: rgba(24, 0, 54, 0.7);
+      padding: 1rem;
+      border: 2px solid var(--neon-purple);
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .card:hover,
+    .card:focus {
+      transform: translateY(-6px);
+      box-shadow: 0 0 15px var(--neon-purple), 0 0 25px rgba(153, 51, 255, 0.4);
+      outline: none;
+    }
+
+    .card-preview {
+      width: 100%;
+      height: 100px;
+      object-fit: contain;
+      background-color: rgba(32, 0, 64, 0.6);
+      border: 1px solid rgba(153, 51, 255, 0.3);
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      margin-top: 0.6rem;
+      color: var(--neon-blue);
+      text-shadow: 0 0 6px rgba(0, 255, 255, 0.5);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      text-align: center;
+    }
+
+    /* Полноэкранное модальное окно */
+    #game-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #000;
+      z-index: 1000;
+      display: none;
+      flex-direction: column;
+    }
+
+    #game-modal.active {
+      display: flex;
+    }
+
+    #game-frame {
+      flex: 1;
+      width: 100%;
+      border: none;
+      background: #000;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: #100020;
+      color: var(--neon-blue);
+      border: 2px solid var(--neon-blue);
+      font-family: 'Consolas', monospace;
+      font-size: 1.5rem;
+      width: 48px;
+      height: 48px;
+      cursor: pointer;
+      z-index: 1001;
+      padding: 0;
+      transition: all 0.2s;
+    }
+
+    .close-btn:hover {
+      background: rgba(0, 255, 255, 0.2);
+      color: #100020;
+    }
+
+    @media (max-width: 900px) {
+      .card {
+        width: 160px;
+        height: 160px;
+      }
+      .card-preview {
+        height: 90px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      body {
+        font-size: 16px;
+      }
+      .container {
+        padding: 2rem 0.8rem 3rem;
+      }
+      h1 {
+        font-size: 2.4rem;
+        letter-spacing: 3px;
+      }
+      .section-image {
+        height: 80px;
+      }
+      .card {
+        width: 140px;
+        height: 140px;
+      }
+      .card-title {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Elena's games</h1>
+    <div id="sections-container"></div>
+  </div>
+
+  <div id="game-modal">
+    <button class="close-btn" aria-label="Закрыть">X</button>
+    <iframe id="game-frame" frameborder="0" allow="fullscreen"></iframe>
+  </div>
+
+  <script>
+    // =============================================================
+    // 💡 ИНСТРУКЦИЯ: КАК ДОБАВИТЬ НОВУЮ КАТЕГОРИЮ ИЛИ ИГРУ
+    // =============================================================
+    //
+    // 🗂 ФАЙЛОВАЯ СТРУКТУРА:
+    //   ваш-сайт/
+    //     ├── index.html
+    //     └── images/
+    //         ├── 1.png, 8.png, 9.png...   ← иконки категорий
+    //         ├── image_3.png, tic_tac.png... ← превью игр
+    //         └── 3.jpg ← фон всей страницы
+    //
+    // ✏️ КАК ДОБАВИТЬ НОВУЮ ИГРУ:
+    //   1. Положите превью в `images/` (например: `my_game.png`)
+    //   2. Добавьте объект в нужный массив `games`:
+    //        {
+    //          title: "My Game",
+    //          preview: "my_game",   // ← без .png
+    //          tags: ["grammar", "teens"],
+    //          url: "my_game.html"
+    //        }
+    //
+    // ✏️ КАК ДОБАВИТЬ НОВУЮ КАТЕГОРИЮ:
+    //   1. Добавьте объект в `sectionsData`:
+    //        {
+    //          title: "MY NEW CATEGORY",
+    //          image: "12",   // ← должен быть файл images/12.png
+    //          games: [ ... ]
+    //        }
+    //   2. Создайте иконку категории: `images/12.png`
+
+    const sectionsData = [
+      {
+        title: "NEW GAMES",
+        image: "1",
+        games: [
+          { title: "Math snowfall", preview: "image_7", tags: ["math", "kids"], url: "Math snowfall.html" },
+          { title: "100/1", preview: "image_6", tags: ["basic lexic", "team game"], url: "100k1.html" },
+          { title: "Vocabulary Memo Game", preview: "image_9", tags: ["vocabulary", "animals", "memo"], url: "Vocabulary Memo Game.html" },
+          { title: "Spark interview", preview: "image_8", tags: ["speaking", "A1 teens test"], url: "interview.html" },
+          { title: "Math Elf Maze", preview: "image_3", tags: ["math", "kids"], url: "math_elf.html" },
+          { title: "Tic Tac Toe", preview: "tic_tac", tags: ["present simple", "grammar"], url: "Tic Tac Toe Minecraft.html" },
+          { title: "Secret Code Quest", preview: "code", tags: ["grammar", "PrSimple VS to be"], url: "Secret Code Quest.html" },
+          { title: "Fruit catcher", preview: "image_4", tags: ["animals", "listening"], url: "Fruit catcher.html" }
+        ]
+      },
+      {
+        title: "KIDS GAMES",
+        image: "8",
+        games: [
+          { title: "Math snowfall", preview: "image_7", tags: ["math", "kids"], url: "Math snowfall.html" },
+          { title: "Math Elf Maze", preview: "image_3", tags: ["math", "kids"], url: "math_elf.html" },
+          { title: "100/1", preview: "image_6", tags: ["basic lexic", "team game"], url: "100k1.html" }
+        ]
+      },
+      {
+        title: "GRAMMAR GAMES",
+        image: "9",
+        games: [
+          { title: "Adverbs of frequency. Quiz", preview: "2", tags: ["Present Simple", "grammar"], url: "Frequency Adverbs Quiz.html" },
+          { title: "Plural Master", preview: "image_6", tags: ["plurals", "grammar"], url: "plural_power_final.html" },
+          { title: "Tic Tac Toe", preview: "tic_tac", tags: ["present simple", "grammar"], url: "Tic Tac Toe Minecraft.html" },
+          { title: "Secret Code Quest", preview: "code", tags: ["grammar", "PrSimple VS to be"], url: "Secret Code Quest.html" },
+          { title: "Fruit catcher", preview: "image_4", tags: ["grammar", "Present Simple"], url: "Fruit catcher.html" }
+        ]
+      },
+      {
+        title: "LEXICAL GAMES",
+        image: "10",
+        games: [
+          { title: "100/1", preview: "image_6", tags: ["basic vocabulary", "team game"], url: "100k1.html" },
+          { title: "Colour Quest", preview: "image_5", tags: ["vocabulary", "quest", "boardgame"], url: "colours quest.html" },
+          { title: "Vocabulary Memo Game", preview: "image_9", tags: ["vocabulary", "animals", "memo"], url: "Vocabulary Memo Game.html" }
+        ]
+      },
+      {
+        title: "LISTENING & SPEAKING GAMES",
+        image: "11",
+        games: [
+          { title: "Spark interview", preview: "image_8", tags: ["speaking", "A1 teens test"], url: "interview.html" },
+		  { title: "Happy new year. Speaking cards", preview: "image_11", tags: ["speaking", "New year"], url: "Happy new year. Speaking cards.html" },
+          { title: "Messy room", preview: "image_10", tags: ["teens", "listening"], url: "Messy room.html" }
+        ]
+      }
+    ];
+
+    const container = document.getElementById('sections-container');
+    const modal = document.getElementById('game-modal');
+    const iframe = document.getElementById('game-frame');
+    const closeBtn = document.querySelector('.close-btn');
+
+    function createCard(game) {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.tabIndex = 0;
+      card.setAttribute('role', 'button');
+      card.setAttribute('aria-label', `Открыть игру: ${game.title}`);
+
+      const previewHTML = game.preview
+        ? `<img class="card-preview" src="images/${game.preview}.png" alt="Превью: ${game.title}" loading="lazy">`
+        : `<div class="card-preview" aria-hidden="true"></div>`;
+
+      card.innerHTML = `${previewHTML}<div class="card-title">${game.title}</div>`;
+
+      card.addEventListener('click', () => openGame(game.url));
+      card.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openGame(game.url);
+        }
+      });
+
+      return card;
+    }
+
+    function createCarousel(games) {
+      const el = document.createElement('div');
+      el.className = 'carousel';
+      el.setAttribute('role', 'region');
+      el.setAttribute('aria-roledescription', 'carousel');
+      games.forEach(game => el.appendChild(createCard(game)));
+      return el;
+    }
+
+    function createNav(carousel) {
+      const nav = document.createElement('div');
+      nav.className = 'carousel-nav';
+
+      const prev = document.createElement('button');
+      prev.className = 'nav-btn';
+      prev.setAttribute('aria-label', 'Предыдущие');
+      prev.textContent = '<';
+      prev.onclick = () => carousel.scrollBy({ left: -250, behavior: 'smooth' });
+
+      const next = document.createElement('button');
+      next.className = 'nav-btn';
+      next.setAttribute('aria-label', 'Следующие');
+      next.textContent = '>';
+      next.onclick = () => carousel.scrollBy({ left: 250, behavior: 'smooth' });
+
+      nav.append(prev, next);
+      return nav;
+    }
+
+    function renderSections() {
+      sectionsData.forEach(section => {
+        const sectionEl = document.createElement('div');
+        sectionEl.className = 'section';
+
+        const header = document.createElement('div');
+        header.className = 'section-header';
+
+        const titleWrapper = document.createElement('div');
+        titleWrapper.className = 'section-title-wrapper';
+
+        const img = document.createElement('img');
+        img.className = 'section-image';
+        img.src = `images/${section.image}.png`;
+        img.alt = section.title;
+        img.loading = 'lazy';
+
+        const title = document.createElement('h2');
+        title.className = 'section-title';
+        title.textContent = section.title;
+
+        titleWrapper.append(img, title);
+
+        const carousel = createCarousel(section.games);
+        const nav = createNav(carousel);
+
+        header.append(titleWrapper, nav);
+        sectionEl.append(header, carousel);
+        container.appendChild(sectionEl);
+      });
+    }
+
+    function openGame(url) {
+      if (!url) {
+        alert('⚠️ Ссылка на игру не указана.');
+        return;
+      }
+      iframe.src = url;
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeGame() {
+      iframe.src = '';
+      modal.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    closeBtn.addEventListener('click', closeGame);
+    modal.addEventListener('click', e => {
+      if (e.target === modal) closeGame();
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && modal.classList.contains('active')) {
+        closeGame();
+      }
+    });
+
+    renderSections();
+  </script>
+</body>
+</html>
