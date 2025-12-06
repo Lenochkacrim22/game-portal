@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Jungle Memory — 2 Players</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            /* New Background Image */
+            background: url('https://i.ytimg.com/vi/q66idaRXbUQ/maxresdefault.jpg') no-repeat center center fixed;
+            background-size: cover;
+            overscroll-behavior: none;
+            color: #1a4d2e; /* Dark green text default */
+        }
+
+        /* Semi-transparent backdrop for readability */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(4px);
+            border: 2px solid rgba(255, 255, 255, 0.9);
+        }
+
+        /* 3D Card Styles */
+        .perspective-1000 { perspective: 1000px; }
+        
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+
+        .card.flipped .card-inner { transform: rotateY(180deg); }
+
+        .card.matched .card-inner {
+            transform: rotateY(180deg);
+            animation: bounce-match 0.6s ease-in-out;
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Card Back - Jungle Leaf Theme */
+        .card-back {
+            background: linear-gradient(135deg, #4ade80 0%, #16a34a 100%); /* Green Gradient */
+            border: 2px solid #bef264; /* Lime border */
+            color: white;
+            font-size: 2rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        /* Leaf pattern overlay (optional css doodle) */
+        .card-back::after {
+            content: '🌿';
+            font-size: 2rem;
+            opacity: 0.5;
+        }
+
+        .card-front {
+            background-color: #fefce8; /* Yellow-50 */
+            transform: rotateY(180deg);
+            border: 3px solid #facc15; /* Yellow border */
+        }
+
+        .card-front img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 8px;
+        }
+
+        /* Active Player Styles - High Contrast */
+        .player-active {
+            transform: scale(1.05);
+            border: 3px solid #facc15 !important; /* Yellow Glow */
+            box-shadow: 0 0 15px rgba(250, 204, 21, 0.6);
+            background: rgba(255, 255, 255, 0.95) !important;
+            opacity: 1 !important;
+        }
+
+        .player-inactive {
+            opacity: 0.7;
+            transform: scale(0.95);
+            background: rgba(255, 255, 255, 0.6);
+        }
+
+        @keyframes bounce-match {
+            0%, 100% { transform: rotateY(180deg) scale(1); }
+            50% { transform: rotateY(180deg) scale(1.1); }
+        }
+
+        /* Custom fit for grid to avoid scrolling */
+        #game-container {
+            /* Calculate height: 100vh minus header (~80px) minus footer (~70px) minus padding */
+            height: calc(100vh - 160px); 
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #game-grid {
+            /* Keep aspect ratio square, but limit size to fit height */
+            max-height: 100%;
+            max-width: 100%;
+            aspect-ratio: 1 / 1; 
+        }
+
+        .modal-overlay { background-color: rgba(20, 50, 20, 0.7); backdrop-filter: blur(3px); }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden">
+
+    <!-- HEADER -->
+    <header class="glass-panel mx-2 mt-2 rounded-xl p-2 flex justify-between items-center shrink-0 z-10 shadow-lg">
+        
+        <!-- Player 1 -->
+        <div id="p1-panel" class="player-panel rounded-lg px-3 py-1 flex flex-col items-center w-24 transition-all duration-300 border-2 border-transparent text-green-800 player-active">
+            <span class="text-xs font-bold uppercase tracking-wider">Player 1</span>
+            <span id="score-p1" class="text-2xl font-black">0</span>
+        </div>
+
+        <!-- Center Info -->
+        <div class="text-center px-2">
+            <h1 class="text-xl md:text-2xl font-black text-green-900 drop-shadow-sm leading-none" style="-webkit-text-stroke: 1px #fff;">Jungle Memory</h1>
+            <div id="turn-indicator" class="mt-1 bg-yellow-400 text-yellow-900 text-xs font-extrabold px-3 py-1 rounded-full shadow-md inline-block">
+                Player 1
+            </div>
+        </div>
+
+        <!-- Player 2 -->
+        <div id="p2-panel" class="player-panel rounded-lg px-3 py-1 flex flex-col items-center w-24 transition-all duration-300 border-2 border-transparent text-orange-800 player-inactive">
+            <span class="text-xs font-bold uppercase tracking-wider">Player 2</span>
+            <span id="score-p2" class="text-2xl font-black">0</span>
+        </div>
+    </header>
+
+    <!-- MAIN GAME AREA (Auto-fit) -->
+    <main class="flex-grow flex items-center justify-center p-2 w-full">
+        <div id="game-container">
+            <div id="game-grid" class="grid grid-cols-4 gap-2 w-full">
+                <!-- Cards injected here -->
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER CONTROLS -->
+    <footer class="glass-panel mx-2 mb-2 rounded-xl p-2 flex justify-center gap-3 shrink-0">
+        <button onclick="game.resetGame()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg shadow-md active:scale-95 transition flex items-center gap-2 text-sm">
+            <span class="text-lg">🔄</span> New Game
+        </button>
+        
+        <button onclick="ui.toggleModal('settings-modal')" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg shadow-md active:scale-95 transition text-sm flex items-center gap-2">
+            <span class="text-lg">⚙️</span>
+        </button>
+
+        <button onclick="game.passTurn()" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg shadow-md active:scale-95 transition text-sm">
+            Pass Turn
+        </button>
+
+        <button onclick="ui.toggleModal('help-modal')" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-lg shadow-md active:scale-95 transition text-sm">
+            ?
+        </button>
+    </footer>
+
+    <!-- MODALS (Styled for Jungle Theme) -->
+    
+    <!-- SETTINGS MODAL -->
+    <div id="settings-modal" class="fixed inset-0 modal-overlay hidden flex items-center justify-center z-50 p-4 opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-2xl shadow-2xl border-4 border-green-500 max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
+            <h2 class="text-2xl font-black text-green-800 mb-4 border-b-2 border-green-100 pb-2">Jungle Settings</h2>
+            
+            <div class="mb-5">
+                <label class="block text-green-700 font-bold mb-2">Grid Size</label>
+                <select id="pair-count" class="w-full p-3 bg-green-50 border-2 border-green-200 rounded-xl focus:ring-2 focus:ring-green-500 outline-none text-green-900 font-bold">
+                    <option value="4">4 Pairs (8 Cards) - Easy</option>
+                    <option value="6">6 Pairs (12 Cards) - Medium</option>
+                    <option value="8" selected>8 Pairs (16 Cards) - Full</option>
+                </select>
+            </div>
+
+            <div class="mb-6">
+                <label class="block text-green-700 font-bold mb-2">Custom Animals</label>
+                <p class="text-xs text-green-600 mb-2">Upload your own pictures!</p>
+                
+                <label class="flex flex-col items-center justify-center w-full h-24 rounded-xl cursor-pointer bg-yellow-50 border-2 border-dashed border-yellow-300 hover:bg-yellow-100 transition">
+                    <div class="flex flex-col items-center justify-center">
+                        <span class="text-2xl">📸</span>
+                        <p class="text-xs text-yellow-700 font-bold">Tap to Upload</p>
+                    </div>
+                    <input id="image-upload" type="file" class="hidden" multiple accept="image/*" onchange="game.handleImageUpload(this)" />
+                </label>
+                
+                <div id="image-preview" class="flex flex-wrap gap-2 mt-3 justify-center"></div>
+            </div>
+
+            <div class="flex justify-end gap-3">
+                <button onclick="ui.toggleModal('settings-modal')" class="text-gray-500 font-bold px-4 py-2 hover:bg-gray-100 rounded-lg">Cancel</button>
+                <button onclick="game.applySettings()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-xl shadow-lg transform active:scale-95 transition">Play!</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- QUIZ MODAL -->
+    <div id="quiz-modal" class="fixed inset-0 modal-overlay hidden flex items-center justify-center z-50 p-4 opacity-0 transition-opacity duration-300 pointer-events-none">
+        <div class="bg-[#fffbeb] border-4 border-yellow-400 rounded-3xl shadow-2xl max-w-sm w-full p-6 transform scale-95 transition-transform duration-300">
+            <div class="text-center mb-4">
+                <span class="text-4xl">🦜</span>
+                <h2 class="text-2xl font-black text-yellow-800 mt-2">Quiz Time!</h2>
+            </div>
+            
+            <div class="bg-white rounded-xl p-4 mb-4 border-2 border-yellow-200 shadow-inner">
+                <p id="quiz-question" class="text-xl font-bold text-green-900 text-center">...</p>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2" id="quiz-options"></div>
+        </div>
+    </div>
+
+    <!-- FEEDBACK MODAL -->
+    <div id="feedback-modal" class="fixed inset-0 modal-overlay hidden flex items-center justify-center z-50 pointer-events-none">
+        <div id="feedback-content" class="bg-white border-4 border-green-400 rounded-full shadow-2xl p-8 text-center transform scale-50 opacity-0 transition-all duration-500 min-w-[200px]">
+            <div id="feedback-icon" class="text-6xl mb-2">🎉</div>
+            <h2 id="feedback-title" class="text-3xl font-black mb-1">Correct!</h2>
+            <p id="feedback-msg" class="text-gray-600 font-bold">Point for Player 1</p>
+        </div>
+    </div>
+
+    <!-- GAME OVER MODAL -->
+    <div id="gameover-modal" class="fixed inset-0 modal-overlay hidden flex items-center justify-center z-50 p-4 opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center border-4 border-green-500">
+            <h2 class="text-3xl font-black text-green-800 mb-6">Game Over!</h2>
+            
+            <div class="flex justify-center gap-8 mb-6 bg-green-50 p-4 rounded-xl">
+                <div class="text-center">
+                    <p class="text-xs uppercase font-bold text-green-600">Player 1</p>
+                    <p id="final-p1" class="text-4xl font-black text-green-800">0</p>
+                </div>
+                <div class="text-center border-l-2 border-green-200 pl-8">
+                    <p class="text-xs uppercase font-bold text-orange-600">Player 2</p>
+                    <p id="final-p2" class="text-4xl font-black text-orange-800">0</p>
+                </div>
+            </div>
+
+            <p id="winner-msg" class="text-xl font-bold text-gray-700 mb-6">...</p>
+
+            <button onclick="game.resetGame()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg transition transform hover:scale-105">
+                Play Again
+            </button>
+        </div>
+    </div>
+
+    <!-- HELP MODAL -->
+    <div id="help-modal" class="fixed inset-0 modal-overlay hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 border-4 border-teal-500">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-black text-teal-800">Rules</h2>
+                <button onclick="ui.toggleModal('help-modal')" class="text-gray-400 font-bold text-xl hover:text-red-500">&times;</button>
+            </div>
+            <ul class="space-y-3 text-gray-700 text-sm font-semibold">
+                <li class="flex gap-3 items-center"><span class="text-xl">🃏</span> Flip 2 cards.</li>
+                <li class="flex gap-3 items-center"><span class="text-xl">🤔</span> Match? Solve the Quiz!</li>
+                <li class="flex gap-3 items-center"><span class="text-xl">✅</span> Correct = Point & Continue.</li>
+                <li class="flex gap-3 items-center"><span class="text-xl">❌</span> Wrong = Next Player.</li>
+            </ul>
+            <button onclick="ui.toggleModal('help-modal')" class="mt-6 w-full bg-teal-100 hover:bg-teal-200 text-teal-900 font-bold py-2 rounded-xl">Got it!</button>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA ---
+        const defaultAnimals = [
+            { name: 'Lion', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Lion_waiting_in_Namibia.jpg/320px-Lion_waiting_in_Namibia.jpg', emoji: '🦁' },
+            { name: 'Elephant', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/African_Bush_Elephant.jpg/320px-African_Bush_Elephant.jpg', emoji: '🐘' },
+            { name: 'Zebra', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Plains_Zebra_Equus_quagga.jpg/320px-Plains_Zebra_Equus_quagga.jpg', emoji: '🦓' },
+            { name: 'Giraffe', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Giraffe_Mikumi_National_Park.jpg/320px-Giraffe_Mikumi_National_Park.jpg', emoji: '🦒' },
+            { name: 'Penguin', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Emperor_Penguin_Manchot_empereur.jpg/320px-Emperor_Penguin_Manchot_empereur.jpg', emoji: '🐧' },
+            { name: 'Monkey', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Bonnet_macaque_%28Macaca_radiata%29_Photograph_By_Shantanu_Kuveskar.jpg/320px-Bonnet_macaque_%28Macaca_radiata%29_Photograph_By_Shantanu_Kuveskar.jpg', emoji: '🐒' },
+            { name: 'Panda', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Grosser_Panda.JPG/320px-Grosser_Panda.JPG', emoji: '🐼' },
+            { name: 'Tiger', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Walking_tiger_female.jpg/320px-Walking_tiger_female.jpg', emoji: '🐅' }
+        ];
+
+        const quizQuestions = [
+            { q: "__ this a cat?", a: "Is", options: ["Is", "Are", "Am"] },
+            { q: "They __ birds.", a: "Are", options: ["Is", "Are", "Am"] },
+            { q: "This __ a turtle.", a: "Is", options: ["Is", "Are", "Am"] },
+            { q: "We __ happy.", a: "Are", options: ["Is", "Are", "Am"] },
+            { q: "__ these dogs?", a: "Are", options: ["Is", "Are", "Am"] },
+            { q: "It __ a big elephant.", a: "Is", options: ["Is", "Are", "Am"] },
+            { q: "The lion __ roaring.", a: "Is", options: ["Is", "Are", "Am"] },
+            { q: "Those __ tall giraffes.", a: "Are", options: ["Is", "Are", "Am"] },
+            { q: "That __ a cute penguin.", a: "Is", options: ["Is", "Are", "Am"] },
+            { q: "The monkeys __ jumping.", a: "Are", options: ["Is", "Are", "Am"] },
+            { q: "__ you a zebra?", a: "Are", options: ["Is", "Are", "Am"] },
+            { q: "She __ a vet.", a: "Is", options: ["Is", "Are", "Am"] },
+            { q: "Here __ the tigers.", a: "Are", options: ["Is", "Are", "Am"] },
+            { q: "__ it a panda?", a: "Is", options: ["Is", "Are", "Am"] }
+        ];
+
+        // --- APP STATE ---
+        const state = {
+            cards: [],
+            flippedCards: [],
+            matchedPairs: 0,
+            currentPlayer: 1,
+            scores: { 1: 0, 2: 0 },
+            isProcessing: false,
+            targetPairs: 8,
+            customImages: []
+        };
+
+        // --- UI CONTROLLER ---
+        const ui = {
+            grid: document.getElementById('game-grid'),
+            p1Panel: document.getElementById('p1-panel'),
+            p2Panel: document.getElementById('p2-panel'),
+            scoreP1: document.getElementById('score-p1'),
+            scoreP2: document.getElementById('score-p2'),
+            turnIndicator: document.getElementById('turn-indicator'),
+            
+            renderBoard(cards) {
+                this.grid.innerHTML = '';
+                
+                // Dynamic styling for Perfect Fit
+                // If 8 cards (4 pairs), use 4 columns but max-width smaller
+                // If 16 cards (8 pairs), use 4 columns full width
+                let gridClass = "grid grid-cols-4 gap-2 w-full h-full";
+                
+                // Adjust card rows based on count to keep it fitting
+                if (state.targetPairs === 4) {
+                    // 8 cards: 2 rows of 4
+                    this.grid.style.gridTemplateRows = "repeat(2, 1fr)";
+                } else if (state.targetPairs === 6) {
+                     // 12 cards: 3 rows of 4
+                    this.grid.style.gridTemplateRows = "repeat(3, 1fr)";
+                } else {
+                    // 16 cards: 4 rows of 4
+                    this.grid.style.gridTemplateRows = "repeat(4, 1fr)";
+                }
+                
+                this.grid.className = gridClass;
+
+                cards.forEach((card, index) => {
+                    const cardEl = document.createElement('div');
+                    cardEl.className = 'card perspective-1000 w-full h-full'; 
+                    // Note: Removed aspect-square here to let gridTemplateRows control height
+                    
+                    cardEl.innerHTML = `
+                        <div class="card-inner" onclick="game.handleCardClick(${index})">
+                            <div class="card-front rounded-xl shadow-sm">
+                                <img src="${card.img}" alt="Animal" onerror="this.onerror=null;this.parentNode.innerHTML='<span style=\'font-size:3rem\'>${card.emoji || '🌿'}</span>';">
+                            </div>
+                            <div class="card-back rounded-xl flex items-center justify-center">
+                                <span>?</span>
+                            </div>
+                        </div>
+                    `;
+                    cardEl.id = `card-${index}`;
+                    this.grid.appendChild(cardEl);
+                });
+            },
+
+            updateScores() {
+                this.scoreP1.innerText = state.scores[1];
+                this.scoreP2.innerText = state.scores[2];
+                
+                if (state.currentPlayer === 1) {
+                    this.p1Panel.classList.remove('player-inactive');
+                    this.p1Panel.classList.add('player-active');
+                    this.p2Panel.classList.add('player-inactive');
+                    this.p2Panel.classList.remove('player-active');
+                    this.turnIndicator.innerText = "Player 1";
+                    this.turnIndicator.className = "mt-1 bg-green-500 text-white text-xs font-extrabold px-3 py-1 rounded-full shadow-md inline-block animate-pulse";
+                } else {
+                    this.p2Panel.classList.remove('player-inactive');
+                    this.p2Panel.classList.add('player-active');
+                    this.p1Panel.classList.add('player-inactive');
+                    this.p1Panel.classList.remove('player-active');
+                    this.turnIndicator.innerText = "Player 2";
+                    this.turnIndicator.className = "mt-1 bg-orange-500 text-white text-xs font-extrabold px-3 py-1 rounded-full shadow-md inline-block animate-pulse";
+                }
+            },
+
+            flipCardVisual(index) {
+                document.getElementById(`card-${index}`).classList.add('flipped');
+            },
+
+            unflipCardsVisual(indices) {
+                setTimeout(() => {
+                    indices.forEach(idx => {
+                        const el = document.getElementById(`card-${idx}`);
+                        if (el) el.classList.remove('flipped');
+                    });
+                }, 1000);
+            },
+
+            markMatched(indices) {
+                indices.forEach(idx => {
+                    const el = document.getElementById(`card-${idx}`);
+                    if (el) el.classList.add('matched');
+                });
+            },
+
+            toggleModal(modalId, show = null) {
+                const modal = document.getElementById(modalId);
+                const isHidden = modal.classList.contains('hidden');
+                const shouldShow = show !== null ? show : isHidden;
+
+                if (shouldShow) {
+                    modal.classList.remove('hidden');
+                    modal.classList.remove('pointer-events-none');
+                    setTimeout(() => {
+                        modal.classList.remove('opacity-0');
+                        const content = modal.querySelector('div'); // animate inner content
+                        if(content) content.classList.remove('scale-95'); 
+                    }, 10);
+                } else {
+                    modal.classList.add('opacity-0');
+                    modal.classList.add('pointer-events-none');
+                    const content = modal.querySelector('div');
+                    if(content) content.classList.add('scale-95');
+                    setTimeout(() => {
+                        modal.classList.add('hidden');
+                    }, 300);
+                }
+            },
+
+            showFeedback(isCorrect, msg) {
+                const modal = document.getElementById('feedback-modal');
+                const content = document.getElementById('feedback-content');
+                const icon = document.getElementById('feedback-icon');
+                const title = document.getElementById('feedback-title');
+                const message = document.getElementById('feedback-msg');
+
+                if (isCorrect) {
+                    icon.innerText = '🍌';
+                    title.innerText = 'Yum!';
+                    title.className = 'text-3xl font-black mb-1 text-green-600';
+                    content.className = 'bg-yellow-50 border-4 border-yellow-400 rounded-full shadow-2xl p-8 text-center transform scale-50 opacity-0 transition-all duration-500 min-w-[200px]';
+                } else {
+                    icon.innerText = '🙈';
+                    title.innerText = 'Oops!';
+                    title.className = 'text-3xl font-black mb-1 text-red-500';
+                    content.className = 'bg-red-50 border-4 border-red-400 rounded-full shadow-2xl p-8 text-center transform scale-50 opacity-0 transition-all duration-500 min-w-[200px]';
+                }
+                
+                message.innerText = msg;
+                modal.classList.remove('hidden');
+                
+                requestAnimationFrame(() => {
+                   content.classList.remove('scale-50', 'opacity-0');
+                   content.classList.add('scale-100', 'opacity-100');
+                });
+
+                setTimeout(() => {
+                    content.classList.remove('scale-100', 'opacity-100');
+                    content.classList.add('scale-50', 'opacity-0');
+                    setTimeout(() => {
+                        modal.classList.add('hidden');
+                    }, 300);
+                }, 1200);
+            },
+
+            renderImagePreview() {
+                const container = document.getElementById('image-preview');
+                container.innerHTML = '';
+                state.customImages.forEach((src, index) => {
+                    const div = document.createElement('div');
+                    div.className = "w-14 h-14 rounded-lg overflow-hidden border-2 border-green-300 relative group shadow-sm";
+                    div.innerHTML = `
+                        <img src="${src}" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-red-500 bg-opacity-70 hidden group-hover:flex items-center justify-center text-white font-bold cursor-pointer" onclick="game.removeImage(${index})">✕</div>
+                    `;
+                    container.appendChild(div);
+                });
+            }
+        };
+
+        // --- GAME LOGIC ---
+        const game = {
+            initGame() {
+                let sourceDeck = [];
+                
+                if (state.customImages.length > 0) {
+                    const customs = state.customImages.map((img, idx) => ({
+                        name: `Custom ${idx}`,
+                        img: img,
+                        emoji: '🌴'
+                    }));
+                    sourceDeck = [...customs];
+                }
+
+                if (sourceDeck.length < state.targetPairs) {
+                    const needed = state.targetPairs - sourceDeck.length;
+                    const defaultsToAdd = defaultAnimals.slice(0, needed);
+                    sourceDeck = [...sourceDeck, ...defaultsToAdd];
+                }
+                
+                sourceDeck = sourceDeck.slice(0, state.targetPairs);
+                const deck = [...sourceDeck, ...sourceDeck];
+                
+                // Shuffle
+                for (let i = deck.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [deck[i], deck[j]] = [deck[j], deck[i]];
+                }
+                
+                state.cards = deck;
+                state.flippedCards = [];
+                state.matchedPairs = 0;
+                state.currentPlayer = 1;
+                state.scores = { 1: 0, 2: 0 };
+                state.isProcessing = false;
+
+                ui.renderBoard(state.cards);
+                ui.updateScores();
+                ui.toggleModal('gameover-modal', false);
+            },
+
+            handleCardClick(index) {
+                if (state.isProcessing) return;
+                if (document.getElementById(`card-${index}`).classList.contains('flipped')) return;
+
+                ui.flipCardVisual(index);
+                state.flippedCards.push(index);
+
+                if (state.flippedCards.length === 2) {
+                    state.isProcessing = true;
+                    this.checkForMatch();
+                }
+            },
+
+            checkForMatch() {
+                const [idx1, idx2] = state.flippedCards;
+                const card1 = state.cards[idx1];
+                const card2 = state.cards[idx2];
+
+                if (card1.img === card2.img) {
+                    setTimeout(() => {
+                        this.launchQuiz();
+                    }, 600);
+                } else {
+                    ui.unflipCardsVisual([idx1, idx2]);
+                    setTimeout(() => {
+                        this.switchTurn();
+                        state.flippedCards = [];
+                        state.isProcessing = false;
+                    }, 1200);
+                }
+            },
+
+            launchQuiz() {
+                const qIndex = Math.floor(Math.random() * quizQuestions.length);
+                const qData = quizQuestions[qIndex];
+                const qEl = document.getElementById('quiz-question');
+                const optsEl = document.getElementById('quiz-options');
+                
+                qEl.innerText = qData.q;
+                optsEl.innerHTML = '';
+
+                qData.options.forEach(opt => {
+                    const btn = document.createElement('button');
+                    btn.innerText = opt;
+                    btn.className = "bg-yellow-100 hover:bg-yellow-200 border-b-4 border-yellow-300 active:border-b-0 text-yellow-900 font-bold py-3 rounded-xl transition transform active:translate-y-1";
+                    btn.onclick = () => this.handleQuizAnswer(opt, qData.a);
+                    optsEl.appendChild(btn);
+                });
+
+                ui.toggleModal('quiz-modal', true);
+            },
+
+            handleQuizAnswer(selected, correct) {
+                ui.toggleModal('quiz-modal', false);
+                const [idx1, idx2] = state.flippedCards;
+
+                if (selected === correct) {
+                    state.scores[state.currentPlayer]++;
+                    ui.showFeedback(true, `+1 Point!`);
+                    ui.markMatched([idx1, idx2]);
+                    state.matchedPairs++;
+                    
+                    state.flippedCards = [];
+                    state.isProcessing = false;
+                    ui.updateScores();
+
+                    if (state.matchedPairs === state.targetPairs) {
+                        setTimeout(() => this.endGame(), 1000);
+                    }
+                } else {
+                    ui.showFeedback(false, `Answer: ${correct}`);
+                    ui.unflipCardsVisual([idx1, idx2]);
+                    setTimeout(() => {
+                        this.switchTurn();
+                        state.flippedCards = [];
+                        state.isProcessing = false;
+                    }, 1500);
+                }
+            },
+
+            switchTurn() {
+                state.currentPlayer = state.currentPlayer === 1 ? 2 : 1;
+                ui.updateScores();
+            },
+
+            passTurn() {
+                if(state.isProcessing) return;
+                this.switchTurn();
+            },
+
+            endGame() {
+                document.getElementById('final-p1').innerText = state.scores[1];
+                document.getElementById('final-p2').innerText = state.scores[2];
+                const msgEl = document.getElementById('winner-msg');
+                
+                if (state.scores[1] > state.scores[2]) {
+                    msgEl.innerText = "Player 1 Wins! 🦁";
+                    msgEl.className = "text-2xl font-black text-green-600 mb-6";
+                } else if (state.scores[2] > state.scores[1]) {
+                    msgEl.innerText = "Player 2 Wins! 🐯";
+                    msgEl.className = "text-2xl font-black text-orange-600 mb-6";
+                } else {
+                    msgEl.innerText = "It's a Tie! 🤝";
+                    msgEl.className = "text-2xl font-black text-teal-600 mb-6";
+                }
+
+                ui.toggleModal('gameover-modal', true);
+            },
+            
+            resetGame() {
+                ui.toggleModal('gameover-modal', false);
+                this.initGame();
+            },
+
+            handleImageUpload(input) {
+                if (input.files) {
+                    const remainingSlots = 8 - state.customImages.length;
+                    if (remainingSlots <= 0) return;
+
+                    Array.from(input.files).slice(0, remainingSlots).forEach(file => {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            state.customImages.push(e.target.result);
+                            ui.renderImagePreview();
+                        };
+                        reader.readAsDataURL(file);
+                    });
+                }
+                input.value = '';
+            },
+
+            removeImage(index) {
+                state.customImages.splice(index, 1);
+                ui.renderImagePreview();
+            },
+
+            applySettings() {
+                const select = document.getElementById('pair-count');
+                state.targetPairs = parseInt(select.value);
+                
+                ui.toggleModal('settings-modal', false);
+                this.resetGame();
+            }
+        };
+
+        game.initGame();
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === "Escape") {
+                ui.toggleModal('help-modal', false);
+                ui.toggleModal('settings-modal', false);
+            }
+        });
+    </script>
+</body>
+</html>

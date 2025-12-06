@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Математический Снегопад</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Fredoka', sans-serif;
+            overflow: hidden;
+            touch-action: none;
+            background-color: #8fd3f4;
+            background-image: url('https://i.postimg.cc/FF63t7Hz/Gemini-Generated-Image-76oxc276oxc276ox.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        canvas {
+            display: block;
+            margin: 0 auto;
+        }
+        .game-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 30;
+            backdrop-filter: blur(3px);
+        }
+        .hidden {
+            display: none !important;
+        }
+        .modal-box {
+            background: rgba(255, 255, 255, 0.98);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 90%;
+            width: 500px;
+            border: 4px solid #60a5fa;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+        .btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1.2rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.1s, background 0.2s;
+            font-weight: bold;
+            margin: 10px;
+            box-shadow: 0 4px 0 #2563eb;
+            display: inline-block;
+        }
+        .btn:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+        .btn-option {
+            width: 45%;
+            margin: 5px;
+            font-size: 1.5rem;
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        /* Collector Bar Styles */
+        #collector-container {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 60vh;
+            width: 40px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 20px;
+            border: 3px solid #fff;
+            z-index: 10;
+            display: flex;
+            flex-direction: column-reverse; /* Fill from bottom */
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        #collector-fill {
+            width: 100%;
+            height: 0%;
+            background: linear-gradient(to top, #3b82f6, #60a5fa);
+            transition: height 0.5s ease-out;
+            position: relative;
+        }
+        #collector-label {
+            position: absolute;
+            left: 70px;
+            top: 50%;
+            transform: translateY(-50%) rotate(-90deg);
+            transform-origin: left center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            white-space: nowrap;
+        }
+        #temp-counter {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255,255,255,0.9);
+            padding: 10px;
+            border-radius: 10px;
+            font-weight: bold;
+            color: #2563eb;
+            z-index: 10;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* Quiz Visuals */
+        .visual-equation {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .snowflake-group {
+            display: flex;
+            gap: 2px;
+            background: #eff6ff;
+            padding: 5px;
+            border-radius: 8px;
+        }
+        .operator {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #1e40af;
+        }
+        .snowflake-icon {
+            font-size: 1.5rem; 
+            line-height: 1;
+        }
+
+        #lives-board {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1.5rem;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="bgMusic" loop>
+        <source src="https://www.dropbox.com/scl/fi/51nhedcikh0g9r8wks03p/kevin-macleod-jingle-bells-7.mp3?rlkey=57ymbl1ttyfzmn4zb9yoh58x6&st=y7ovqx8s&raw=1" type="audio/mpeg">
+    </audio>
+
+    <!-- HUD -->
+    <div id="collector-container">
+        <div id="collector-fill"></div>
+    </div>
+    <div id="collector-label">Снежинкосборник (Цель: 100)</div>
+    
+    <div id="temp-counter">
+        Собрано сейчас: <span id="pending-score">0</span>/5
+    </div>
+    
+    <div id="lives-board">❤️❤️❤️❤️❤️</div>
+
+    <!-- Canvas -->
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- Start Screen -->
+    <div id="startScreen" class="game-overlay">
+        <div class="modal-box">
+            <h1 class="text-4xl text-blue-600 font-bold mb-2">Математический Снегопад</h1>
+            <p class="text-gray-600 mb-4 text-lg">Помоги эльфу собрать 100 снежинок!</p>
+            
+            <div class="mb-6 text-left bg-blue-50 p-4 rounded-lg text-sm text-gray-700">
+                <p>1. Лови 5 снежинок.</p>
+                <p>2. Решай пример, чтобы положить их в сборник.</p>
+                <p>3. Ошибка? Снежинки растают!</p>
+            </div>
+
+            <div class="mb-6">
+                <label class="block text-gray-700 font-bold mb-2">Скорость игры:</label>
+                <div class="flex justify-center gap-2">
+                    <button onclick="setSpeed(0.7, this)" class="speed-btn bg-gray-200 px-4 py-2 rounded hover:bg-blue-200 transition">Медленно</button>
+                    <button onclick="setSpeed(1.0, this)" class="speed-btn bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition shadow-lg ring-2 ring-blue-300">Нормально</button>
+                    <button onclick="setSpeed(1.4, this)" class="speed-btn bg-gray-200 px-4 py-2 rounded hover:bg-blue-200 transition">Быстро</button>
+                </div>
+            </div>
+
+            <button class="btn text-xl px-8" onclick="startGame()">Начать сбор!</button>
+        </div>
+    </div>
+
+    <!-- Quiz Modal -->
+    <div id="quizModal" class="game-overlay hidden">
+        <div class="modal-box border-blue-400">
+            <h2 class="text-2xl text-blue-600 font-bold mb-4">Время проверки!</h2>
+            
+            <!-- Visual representation -->
+            <div id="quizVisual" class="visual-equation"></div>
+            
+            <!-- Numeric representation -->
+            <p id="quizText" class="text-3xl font-bold text-gray-800 mb-6"></p>
+            
+            <div id="quizOptions" class="flex flex-wrap justify-center">
+                <!-- Buttons will be injected here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Over / Win Modal -->
+    <div id="endScreen" class="game-overlay hidden">
+        <div class="modal-box border-red-400">
+            <h2 id="endTitle" class="text-3xl font-bold mb-4">Игра окончена</h2>
+            <p id="endReason" class="text-gray-600 mb-2"></p>
+            <p id="endScore" class="text-xl text-blue-700 font-bold mb-6">Собрано: 0 / 100</p>
+            <button class="btn" onclick="location.reload()">Играть снова</button>
+        </div>
+    </div>
+
+    <script>
+        // --- CONFIG ---
+        const CONFIG = {
+            playerImg: "https://i.postimg.cc/B60CDRHD/elf_1_svg.png",
+            snowflakeImg: "https://i.postimg.cc/FzFgCcPh/snowflake_svgrepo_com.png",
+            goal: 100,
+            batchSize: 5 // How many to catch before quiz
+        };
+
+        // --- STATE ---
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        let gameActive = false;
+        let isPaused = false;
+        
+        let bankedScore = 0;     // Score safely in the "tube"
+        let pendingScore = 0;    // Score collected in current run (0-5)
+        let lives = 5;
+        let speedMultiplier = 1.0;
+        
+        let fruits = [];
+        let particles = [];
+        let usedQuestions = new Set(); // To prevent repeat math problems
+
+        // Assets
+        const playerImg = new Image();
+        playerImg.crossOrigin = "anonymous";
+        playerImg.src = CONFIG.playerImg;
+        
+        const snowImg = new Image();
+        snowImg.crossOrigin = "anonymous";
+        snowImg.src = CONFIG.snowflakeImg;
+
+        // --- SETUP ---
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            player.y = canvas.height - 120;
+        }
+        window.addEventListener('resize', resize);
+
+        function setSpeed(val, btn) {
+            speedMultiplier = val;
+            // Visual selection update
+            document.querySelectorAll('.speed-btn').forEach(b => {
+                b.classList.remove('bg-blue-500', 'text-white', 'shadow-lg', 'ring-2');
+                b.classList.add('bg-gray-200');
+            });
+            btn.classList.remove('bg-gray-200');
+            btn.classList.add('bg-blue-500', 'text-white', 'shadow-lg', 'ring-2');
+        }
+
+        // --- GAME CLASSES ---
+        class Player {
+            constructor() {
+                this.width = 100;
+                this.height = 120;
+                this.x = canvas.width / 2 - this.width / 2;
+                this.y = canvas.height - 120;
+                this.speed = 8;
+            }
+            update() {
+                if (touchX !== null) {
+                    const targetX = touchX - this.width / 2;
+                    this.x += (targetX - this.x) * 0.2;
+                } else {
+                    if (keys.ArrowLeft) this.x -= this.speed;
+                    if (keys.ArrowRight) this.x += this.speed;
+                }
+                // Clamp
+                if (this.x < 0) this.x = 0;
+                if (this.x + this.width > canvas.width) this.x = canvas.width - this.width;
+            }
+            draw() {
+                if (playerImg.complete) {
+                    ctx.drawImage(playerImg, this.x, this.y, this.width, this.height);
+                } else {
+                    ctx.fillText("🧝", this.x, this.y);
+                }
+            }
+        }
+
+        class Snowflake {
+            constructor() {
+                this.size = 50;
+                this.x = Math.random() * (canvas.width - this.size);
+                this.y = -this.size;
+                this.speed = (Math.random() * 2 + 2.5) * speedMultiplier;
+                this.rotation = Math.random() * Math.PI * 2;
+                this.rotSpeed = (Math.random() - 0.5) * 0.1;
+            }
+            update() {
+                this.y += this.speed;
+                this.rotation += this.rotSpeed;
+            }
+            draw() {
+                ctx.save();
+                ctx.translate(this.x + this.size/2, this.y + this.size/2);
+                ctx.rotate(this.rotation);
+                if (snowImg.complete) {
+                    ctx.drawImage(snowImg, -this.size/2, -this.size/2, this.size, this.size);
+                } else {
+                    ctx.font = "40px Arial";
+                    ctx.fillText("❄️", -15, 15);
+                }
+                ctx.restore();
+            }
+        }
+
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.vx = (Math.random() - 0.5) * 10;
+                this.vy = (Math.random() - 0.5) * 10;
+                this.life = 1.0;
+                this.color = color;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vy += 0.2; // gravity
+                this.life -= 0.02;
+            }
+            draw() {
+                ctx.globalAlpha = this.life;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, 4, 0, Math.PI*2);
+                ctx.fill();
+                ctx.globalAlpha = 1.0;
+            }
+        }
+
+        const player = new Player();
+        const keys = { ArrowLeft: false, ArrowRight: false };
+        let touchX = null;
+
+        // Inputs
+        window.addEventListener('keydown', e => keys[e.code] = true);
+        window.addEventListener('keyup', e => keys[e.code] = false);
+        canvas.addEventListener('touchmove', e => { e.preventDefault(); touchX = e.touches[0].clientX; }, {passive:false});
+        canvas.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, {passive:false});
+        canvas.addEventListener('touchend', () => touchX = null);
+        canvas.addEventListener('mousemove', e => touchX = e.clientX);
+
+
+        // --- GAME LOGIC ---
+
+        function startGame() {
+            const music = document.getElementById('bgMusic');
+            if(music) { music.volume = 0.3; music.play().catch(e=>{}); }
+
+            document.getElementById('startScreen').classList.add('hidden');
+            document.getElementById('endScreen').classList.add('hidden');
+            
+            bankedScore = 0;
+            pendingScore = 0;
+            lives = 5;
+            fruits = [];
+            particles = [];
+            usedQuestions.clear();
+            gameActive = true;
+            isPaused = false;
+            
+            updateHUD();
+            resize();
+            requestAnimationFrame(loop);
+        }
+
+        function generateMathQuestion() {
+            // Try to find a unique question
+            let attempts = 0;
+            let qObj = null;
+            
+            while(attempts < 50) {
+                const isAddition = Math.random() > 0.5;
+                let a = Math.floor(Math.random() * 11); // 0-10
+                let b = Math.floor(Math.random() * 11); // 0-10
+                
+                let questionText = "";
+                let answer = 0;
+                let symbol = "";
+
+                if (isAddition) {
+                    // Cap at 20
+                    while (a + b > 20) { b--; } 
+                    if (b < 0) b = 0;
+                    answer = a + b;
+                    symbol = "+";
+                } else {
+                    // Subtraction, result >= 0
+                    if (a < b) [a, b] = [b, a]; // swap
+                    answer = a - b;
+                    symbol = "-";
+                }
+
+                const qKey = `${a}${symbol}${b}`;
+                if (!usedQuestions.has(qKey)) {
+                    usedQuestions.add(qKey);
+                    qObj = { a, b, symbol, answer };
+                    break;
+                }
+                attempts++;
+            }
+
+            // Fallback if loop exhausted (unlikely for range 20)
+            if (!qObj) qObj = { a: 2, b: 2, symbol: "+", answer: 4 };
+
+            // Generate Distractors
+            let options = new Set([qObj.answer]);
+            while(options.size < 4) {
+                let offset = Math.floor(Math.random() * 5) + 1; // 1 to 5
+                let sign = Math.random() > 0.5 ? 1 : -1;
+                let fake = qObj.answer + (offset * sign);
+                if (fake >= 0 && fake <= 25) options.add(fake);
+            }
+            
+            return {
+                ...qObj,
+                options: Array.from(options).sort(() => Math.random() - 0.5)
+            };
+        }
+
+        function generateSnowflakeIcons(count) {
+            let html = '<div class="snowflake-group">';
+            for(let i=0; i<count; i++) {
+                html += '<span class="snowflake-icon">❄️</span>';
+            }
+            if(count === 0) html += '<span class="text-gray-400 text-xl">0</span>';
+            html += '</div>';
+            return html;
+        }
+
+        function triggerQuiz() {
+            isPaused = true;
+            const q = generateMathQuestion();
+            
+            const modal = document.getElementById('quizModal');
+            const visualDiv = document.getElementById('quizVisual');
+            const textDiv = document.getElementById('quizText');
+            const optsDiv = document.getElementById('quizOptions');
+
+            // Render Visuals
+            visualDiv.innerHTML = `
+                ${generateSnowflakeIcons(q.a)}
+                <div class="operator">${q.symbol}</div>
+                ${generateSnowflakeIcons(q.b)}
+                <div class="operator">=</div>
+                <div class="snowflake-group border-2 border-dashed border-blue-300 w-12 h-12 flex items-center justify-center text-blue-300 font-bold">?</div>
+            `;
+
+            textDiv.textContent = `${q.a} ${q.symbol} ${q.b} = ?`;
+            
+            optsDiv.innerHTML = '';
+            q.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'btn btn-option';
+                btn.textContent = opt;
+                btn.onclick = () => handleQuizAnswer(opt === q.answer);
+                optsDiv.appendChild(btn);
+            });
+
+            modal.classList.remove('hidden');
+        }
+
+        function handleQuizAnswer(correct) {
+            const modal = document.getElementById('quizModal');
+            modal.classList.add('hidden');
+            
+            if (correct) {
+                // Bank the pending score
+                bankedScore += pendingScore;
+                createExplosion(canvas.width/2, canvas.height/2, '#4ade80'); // Green confetti
+            } else {
+                // Lose pending score AND penalty from bank
+                createExplosion(canvas.width/2, canvas.height/2, '#f87171'); // Red confetti
+                bankedScore -= 5;
+                if (bankedScore < 0) bankedScore = 0;
+            }
+            
+            pendingScore = 0; // Reset pending bucket
+            isPaused = false;
+            keys.ArrowLeft = false; 
+            keys.ArrowRight = false;
+            touchX = null;
+            
+            updateHUD();
+            checkWin();
+        }
+
+        function updateHUD() {
+            // Update progress bar height
+            const pct = Math.min((bankedScore / CONFIG.goal) * 100, 100);
+            document.getElementById('collector-fill').style.height = `${pct}%`;
+            
+            // Update label on tube if needed, or just keep static goal
+            
+            // Update temp counter
+            document.getElementById('pending-score').textContent = pendingScore;
+            
+            // Lives
+            document.getElementById('lives-board').textContent = '❤️'.repeat(lives);
+        }
+
+        function checkWin() {
+            if (bankedScore >= CONFIG.goal) {
+                gameActive = false;
+                document.getElementById('endTitle').textContent = "ПОБЕДА!";
+                document.getElementById('endTitle').className = "text-3xl text-green-600 font-bold mb-4";
+                document.getElementById('endReason').textContent = "Снежинкосборник полон!";
+                document.getElementById('endScore').textContent = `Собрано: ${bankedScore}`;
+                document.getElementById('endScreen').classList.remove('hidden');
+                createExplosion(canvas.width/2, canvas.height/2, '#FFD700');
+            }
+        }
+
+        function createExplosion(x, y, color) {
+            for(let i=0; i<20; i++) {
+                particles.push(new Particle(x, y, color));
+            }
+        }
+
+        function loop() {
+            if (!gameActive) return;
+            if (!isPaused) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                player.update();
+                player.draw();
+
+                // Spawn logic
+                if (Math.random() < 0.02) {
+                    fruits.push(new Snowflake());
+                }
+
+                // Update fruits/snowflakes
+                for (let i = fruits.length - 1; i >= 0; i--) {
+                    let f = fruits[i];
+                    f.update();
+                    f.draw();
+
+                    // Collision
+                    if (
+                        f.y + f.size/2 > player.y &&
+                        f.y - f.size/2 < player.y + player.height &&
+                        f.x + f.size/2 > player.x &&
+                        f.x - f.size/2 < player.x + player.width
+                    ) {
+                        // Catch
+                        fruits.splice(i, 1);
+                        pendingScore++;
+                        createExplosion(f.x, f.y, '#fff');
+                        
+                        if (pendingScore >= CONFIG.batchSize) {
+                            triggerQuiz();
+                        }
+                        updateHUD();
+                    }
+                    // Miss
+                    else if (f.y > canvas.height) {
+                        fruits.splice(i, 1);
+                        lives--;
+                        updateHUD();
+                        if (lives <= 0) {
+                            gameActive = false;
+                            document.getElementById('endTitle').textContent = "Игра окончена";
+                            document.getElementById('endTitle').className = "text-3xl text-red-600 font-bold mb-4";
+                            document.getElementById('endReason').textContent = "Закончились жизни";
+                            document.getElementById('endScore').textContent = `Итог: ${bankedScore}`;
+                            document.getElementById('endScreen').classList.remove('hidden');
+                        }
+                    }
+                }
+            }
+
+            // Particles always animate
+            for (let i = particles.length - 1; i >= 0; i--) {
+                particles[i].update();
+                particles[i].draw();
+                if (particles[i].life <= 0) particles.splice(i, 1);
+            }
+
+            requestAnimationFrame(loop);
+        }
+        
+        resize();
+    </script>
+</body>
+</html>

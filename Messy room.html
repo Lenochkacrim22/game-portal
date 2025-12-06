@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🎧 Messy Room Adventure (A1+)</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 850px;
+      margin: 20px auto;
+      padding: 20px;
+      background: linear-gradient(to bottom, #f8f9ff, #ffffff);
+      color: #2c384a;
+    }
+    h1 {
+      text-align: center;
+      color: #e74c3c;
+      margin-bottom: 5px;
+    }
+    .subtitle {
+      text-align: center;
+      color: #7f8c8d;
+      margin-bottom: 25px;
+    }
+    .section {
+      background: white;
+      border-radius: 14px;
+      padding: 22px;
+      margin-bottom: 25px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    }
+    .section h2 {
+      margin-top: 0;
+      color: #2980b9;
+      border-bottom: 2px solid #ecf0f1;
+      padding-bottom: 8px;
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 10px;
+      margin: 15px 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .find-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 10px;
+      margin-top: 15px;
+    }
+    .find-item {
+      background: #e3f2fd;
+      padding: 8px;
+      text-align: center;
+      border-radius: 8px;
+      font-weight: 600;
+      color: #1976d2;
+    }
+    audio {
+      width: 100%;
+      max-width: 500px;
+    }
+    input[type="text"] {
+      padding: 6px;
+      border: 1px solid #bdc3c7;
+      border-radius: 6px;
+      width: 140px;
+      margin-left: 8px;
+    }
+    .fb-line {
+      margin: 12px 0;
+      font-size: 16px;
+    }
+    button {
+      display: block;
+      margin: 20px auto;
+      padding: 11px 28px;
+      font-size: 17px;
+      background: #3498db;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #2980b9;
+    }
+    .correct { color: #27ae60; font-weight: bold; }
+    .incorrect { color: #e74c3c; font-weight: bold; }
+    .role-play {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-top: 15px;
+    }
+    .role-card {
+      flex: 1;
+      min-width: 250px;
+      background: #f8fbf8;
+      border-radius: 12px;
+      padding: 20px;
+      border-top: 4px solid #2ecc71;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+    }
+    .role-card h3 {
+      margin-top: 0;
+      color: #27ae60;
+    }
+    .phrases {
+      padding-left: 20px;
+      margin: 12px 0;
+    }
+    .phrases li {
+      margin-bottom: 6px;
+      color: #2c3e50;
+    }
+    .activity-title {
+      font-weight: 700;
+      color: #2c3e50;
+      margin: 25px 0 15px;
+      font-size: 20px;
+    }
+    .tf-item, .mc-item {
+      margin: 12px 0;
+      padding: 8px 0;
+    }
+    label {
+      display: inline-block;
+      margin-right: 15px;
+      cursor: pointer;
+    }
+    .draggable {
+      background: #f0f8ff;
+      border: 1px solid #cce5ff;
+      padding: 10px;
+      margin: 6px 0;
+      border-radius: 6px;
+      cursor: grab;
+    }
+    .draggable:active {
+      cursor: grabbing;
+    }
+    .drop-area {
+      min-height: 60px;
+      background: #f8fdff;
+      border: 2px dashed #3498db;
+      border-radius: 8px;
+      padding: 15px;
+      margin: 15px 0;
+    }
+    .drop-item {
+      background: #e3f2fd;
+      padding: 10px;
+      margin: 6px 0;
+      border-radius: 6px;
+      border-left: 3px solid #2980b9;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎧 Messy Room Adventure</h1>
+  <p class="subtitle">A1+ English Practice • Listen, Look & Learn!</p>
+
+  <!-- 1. LOOK: Find 10 things -->
+  <div class="section">
+    <h2>👀 Step 1: Look at the picture</h2>
+    <img src="room-picture.png" alt="A messy teen room with cool stuff">
+    <p><strong>Find these 10 things in the picture:</strong></p>
+    <div class="find-grid">
+      <div class="find-item">1. Guitar</div>
+      <div class="find-item">2. Telescope</div>
+      <div class="find-item">3. Hand armchair</div>
+      <div class="find-item">4. Skateboard</div>
+      <div class="find-item">5. Laptop</div>
+      <div class="find-item">6. Comics</div>
+      <div class="find-item">7. Trainers</div>
+      <div class="find-item">8. Juice</div>
+      <div class="find-item">9. “ROCK” poster</div>
+      <div class="find-item">10. Open window</div>
+    </div>
+  </div>
+
+  <!-- 2. LISTEN: Audio player -->
+  <div class="section">
+    <h2>🎧 Step 2: Listen to the dialogue</h2>
+    <audio controls>
+      <source src="dialogue.mp3" type="audio/mpeg">
+      Your browser does not support the audio element.
+    </audio>
+    <p><em>Press ▶️ and listen carefully!</em></p>
+  </div>
+
+  <!-- 3. ACTIVITIES -->
+  <div class="activity-title">✅ Now complete the activities below:</div>
+
+  <!-- Fill in the Blanks -->
+  <div class="section">
+    <h2>✏️ Activity 1: Fill in the Blanks</h2>
+    <p>Complete the sentences with words from the dialogue.</p>
+    <div id="fb-container"></div>
+    <button onclick="checkFillBlanks()">Check Answers</button>
+    <div id="fb-feedback"></div>
+  </div>
+
+  <!-- Put the Dialogue in Order -->
+  <div class="section">
+    <h2>🧩 Activity 2: Put the Dialogue in Order</h2>
+    <p>Drag the lines into the correct order. <strong>Lily starts!</strong></p>
+    
+    <h3>Lines to sort:</h3>
+    <div id="draggable-list"></div>
+    
+    <h3>Your order:</h3>
+    <div class="drop-area" id="drop-area">
+      <em>Drop lines here in the correct order...</em>
+    </div>
+    
+    <button onclick="checkOrder()">Check Order</button>
+    <div id="order-result"></div>
+  </div>
+
+  <!-- True/False -->
+  <div class="section">
+    <h2>✅ Activity 3: True or False?</h2>
+    <div id="tf-container"></div>
+    <button onclick="checkTF()">Check Answers</button>
+  </div>
+
+  <!-- Multiple Choice -->
+  <div class="section">
+    <h2>🔘 Activity 4: Multiple Choice</h2>
+    <div id="mc-container"></div>
+    <button onclick="checkMC()">Check Answers</button>
+  </div>
+
+  <!-- Role-Play (LAST!) -->
+  <div class="section">
+    <h2>🎭 Final Activity: Role-Play with a Partner!</h2>
+    <p>Practice the dialogue together! Use these helpful phrases:</p>
+    
+    <div class="role-play">
+      <div class="role-card">
+        <h3>👧 You are LILY (cheerful, loves messy rooms)</h3>
+        <ul class="phrases">
+          <li>“Whoa! Look at this room — it’s so cool!”</li>
+          <li>“It’s not a mess — it’s style!”</li>
+          <li>“I love the armchair shaped like a hand!”</li>
+          <li>“Who needs tidy when you’ve got rock music?”</li>
+          <li>“Clean later. Rock now!”</li>
+        </ul>
+      </div>
+      
+      <div class="role-card">
+        <h3>👦 You are MAX (funny, a bit sarcastic)</h3>
+        <ul class="phrases">
+          <li>“Love it? It’s a disaster zone!”</li>
+          <li>“My trainers are under the bed… and I can’t find them!”</li>
+          <li>“This room has everything… except clean socks!”</li>
+          <li>“I’d hide under the bed from my angry mum!”</li>
+          <li>“Why choose? Let’s put shoes everywhere!”</li>
+        </ul>
+      </div>
+    </div>
+    <p style="text-align:center; margin-top:20px; font-weight:600; color:#2980b9;">
+      🎤 Take turns! Be expressive! Have fun!
+    </p>
+  </div>
+
+  <script>
+    // === ВСТРОЕННЫЕ ЗВУКИ ===
+    function playSound(type) {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = ctx.createOscillator();
+        const gainNode = ctx.createGain();
+        oscillator.connect(gainNode);
+        gainNode.connect(ctx.destination);
+        if (type === 'correct') {
+          oscillator.frequency.value = 600;
+          oscillator.type = 'sine';
+          gainNode.gain.value = 0.2;
+          oscillator.start();
+          oscillator.stop(ctx.currentTime + 0.3);
+        } else {
+          oscillator.frequency.value = 200;
+          oscillator.type = 'sawtooth';
+          gainNode.gain.value = 0.15;
+          oscillator.start();
+          oscillator.stop(ctx.currentTime + 0.4);
+        }
+      } catch (e) { /* silent fail */ }
+    }
+
+    // === Fill in the Blanks ===
+    const fbItems = [
+      { sentence: "Max says: “Shoes everywhere — under the ________!”", answer: "bed" },
+      { sentence: "Lily loves the ________ that looks like a giant hand.", answer: "armchair" },
+      { sentence: "The girl is reading ________ on the floor.", answer: "comics" },
+      { sentence: "Max can’t find his ________.", answer: "trainers" },
+      { sentence: "They say: “Clean later. ________ now!”", answer: "Rock" }
+    ];
+
+    function renderFillBlanks() {
+      const container = document.getElementById("fb-container");
+      fbItems.forEach((item, i) => {
+        const div = document.createElement("div");
+        div.className = "fb-line";
+        div.innerHTML = `${i + 1}. ${item.sentence} <input type="text" id="fb-${i}" size="12">`;
+        container.appendChild(div);
+      });
+    }
+
+    function checkFillBlanks() {
+      let allCorrect = true;
+      let feedbackHTML = "<ul>";
+      fbItems.forEach((item, i) => {
+        const input = document.getElementById(`fb-${i}`);
+        const userAnswer = input.value.trim();
+        const isCorrect = userAnswer.toLowerCase() === item.answer.toLowerCase();
+        if (!isCorrect) {
+          allCorrect = false;
+          feedbackHTML += `<li class="incorrect">❌ “${userAnswer}” → Correct: <span class="correct">${item.answer}</span></li>`;
+        } else {
+          feedbackHTML += `<li class="correct">✅ “${userAnswer}” — Correct!</li>`;
+        }
+      });
+      feedbackHTML += "</ul>";
+      document.getElementById("fb-feedback").innerHTML = feedbackHTML;
+      playSound(allCorrect ? 'correct' : 'wrong');
+    }
+
+    // === PUT IN ORDER (FULLY WORKING) ===
+    const dialogueLines = [
+      "Whoa! Look at this room in the magazine! It’s so messy… but I love it!",
+      "Love it? It’s a disaster zone! Shoes everywhere—under the bed, on the floor, even near the window! My trainers are under my bed too… and I still can’t find them!",
+      "That’s not a problem—it’s style! She has a guitar, a telescope, and an armchair shaped like a giant hand! Maybe she’s a rock star! Look at the wall: “ROCK!” and “YEAH!” So cool!",
+      "Yeah, until her mum walks in. See that door? “Angry mum!” with the red face. I’d run if I were her. Or hide under the bed… with all those shoes.",
+      "Maybe she’s hiding from her mum right now! Look—she’s just lying on the floor, reading comics, drinking juice. No school, no rules. Perfect!",
+      "And check this out—a skateboard! A laptop! A game controller! This room has everything… except clean socks. And maybe a vacuum cleaner.",
+      "The window’s open too. Fresh air? Or escape route? I’d put my books on the desk… but only if I had to. Otherwise, I’d stay on the floor forever.",
+      "Same. But if I lived here, I’d put my trainers on the shelf. …Or maybe under the bed. Why choose? Let’s do both!",
+      "Exactly! Who needs tidy when you’ve got music, snacks, and a giant hand armchair?",
+      "True. Clean later. Rock now."
+    ];
+
+    function renderDraggableList() {
+      const list = document.getElementById("draggable-list");
+      const shuffled = [...dialogueLines].sort(() => Math.random() - 0.5);
+      shuffled.forEach((line, idx) => {
+        const div = document.createElement("div");
+        div.className = "draggable";
+        div.draggable = true;
+        div.textContent = line;
+        div.dataset.line = line;
+
+        div.addEventListener("dragstart", (e) => {
+          e.dataTransfer.setData("text/plain", line);
+          e.dataTransfer.effectAllowed = "move";
+          setTimeout(() => div.style.opacity = "0.4", 0);
+        });
+
+        div.addEventListener("dragend", () => {
+          div.style.opacity = "1";
+        });
+
+        list.appendChild(div);
+      });
+    }
+
+    const dropArea = document.getElementById("drop-area");
+
+    dropArea.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "move";
+      dropArea.style.backgroundColor = "#e3f2fd";
+    });
+
+    dropArea.addEventListener("dragleave", () => {
+      dropArea.style.backgroundColor = "#f8fdff";
+    });
+
+    dropArea.addEventListener("drop", (e) => {
+      e.preventDefault();
+      dropArea.style.backgroundColor = "#f8fdff";
+      const line = e.dataTransfer.getData("text/plain");
+      if (!line) return;
+
+      const dropItem = document.createElement("div");
+      dropItem.className = "drop-item";
+      dropItem.textContent = line;
+      dropItem.dataset.line = line;
+
+      // Вставляем в конец
+      dropArea.appendChild(dropItem);
+
+      // Удаляем исходный элемент из списка
+      const original = Array.from(document.querySelectorAll(".draggable"))
+        .find(el => el.textContent === line);
+      if (original) original.remove();
+    });
+
+    function checkOrder() {
+      const dropItems = Array.from(dropArea.querySelectorAll(".drop-item")).map(el => el.textContent);
+      const isCorrect = dropItems.length === dialogueLines.length && 
+                        dropItems.every((line, i) => line === dialogueLines[i]);
+      
+      const resultEl = document.getElementById("order-result");
+      if (isCorrect) {
+        resultEl.innerHTML = '<span class="correct">✅ Perfect! You got the order right!</span>';
+        playSound('correct');
+      } else {
+        resultEl.innerHTML = '<span class="incorrect">❌ Not quite. Try again!</span>';
+        playSound('wrong');
+      }
+    }
+
+    // === True/False & MC (unchanged) ===
+    const tfQuestions = [
+      { q: "The girl in the picture has a messy room.", ans: true },
+      { q: "Lily thinks the room is cool and fun.", ans: true },
+      { q: "Max loves the room because it’s very clean.", ans: false },
+      { q: "There is a guitar and a telescope in the room.", ans: true },
+      { q: "The mum is happy with the room.", ans: false },
+      { q: "The girl is reading comics on the floor.", ans: true },
+      { q: "Max wants to put his trainers on the shelf, not under the bed.", ans: false },
+      { q: "There is a skateboard and a laptop in the room.", ans: true },
+      { q: "There is an armchair shaped like a giant hand in the room.", ans: true },
+      { q: "They agree: “Clean later. Rock now.”", ans: true }
+    ];
+
+    function renderTF() {
+      const container = document.getElementById("tf-container");
+      tfQuestions.forEach((item, i) => {
+        const div = document.createElement("div");
+        div.className = "tf-item";
+        div.innerHTML = `
+          <p><strong>${i + 1}.</strong> ${item.q}</p>
+          <label><input type="radio" name="tf${i}" value="true"> True</label>
+          <label><input type="radio" name="tf${i}" value="false"> False</label>
+          <span id="tf-res${i}"></span>
+          <div id="tf-correct${i}" style="display:none; margin-top:4px; color:#27ae60;">Correct: ${item.ans ? 'True' : 'False'}</div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function checkTF() {
+      let allCorrect = true;
+      tfQuestions.forEach((item, i) => {
+        const selected = document.querySelector(`input[name="tf${i}"]:checked`);
+        const resEl = document.getElementById(`tf-res${i}`);
+        const correctEl = document.getElementById(`tf-correct${i}`);
+        if (!selected) {
+          resEl.textContent = "❓";
+          resEl.className = "";
+          correctEl.style.display = "block";
+          allCorrect = false;
+        } else {
+          const isCorrect = (selected.value === String(item.ans));
+          resEl.textContent = isCorrect ? "✅" : "❌";
+          resEl.className = isCorrect ? "correct" : "incorrect";
+          correctEl.style.display = isCorrect ? "none" : "block";
+          if (!isCorrect) allCorrect = false;
+        }
+      });
+      playSound(allCorrect ? 'correct' : 'wrong');
+    }
+
+    const mcQuestions = [
+      { q: "What does Max say he would do if he lived in the room?", options: ["Clean it every day", "Put his trainers on the shelf or under the bed", "Throw away the guitar and telescope", "Close the window and hide"], ans: 1 },
+      { q: "Where is the girl in the picture sitting?", options: ["On the bed", "In the giant hand armchair", "On the floor", "At the desk"], ans: 2 },
+      { q: "What does Lily say she would do with her books?", options: ["Leave them under the bed", "Put them on the desk — but only if she had to", "Throw them out the window", "Use them as a pillow"], ans: 1 },
+      { q: "How does Max describe the room at the beginning?", options: ["\"So cool!\"", "\"A total mess!\"", "\"A disaster zone!\"", "\"Perfect for homework!\""], ans: 2 },
+      { q: "What kind of music do Lily and Max think the girl likes?", options: ["Classical", "Pop", "Rock", "Jazz"], ans: 2 }
+    ];
+
+    function renderMC() {
+      const container = document.getElementById("mc-container");
+      mcQuestions.forEach((item, i) => {
+        const div = document.createElement("div");
+        div.className = "mc-item";
+        let opts = "";
+        item.options.forEach((opt, j) => {
+          opts += `<div><label><input type="radio" name="mc${i}" value="${j}"> ${opt}</label></div>`;
+        });
+        div.innerHTML = `
+          <p><strong>${i + 1}.</strong> ${item.q}</p>
+          ${opts}
+          <span id="mc-res${i}"></span>
+          <div id="mc-correct${i}" style="display:none; margin-top:4px; color:#27ae60;">Correct: ${item.options[item.ans]}</div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function checkMC() {
+      let allCorrect = true;
+      mcQuestions.forEach((item, i) => {
+        const selected = document.querySelector(`input[name="mc${i}"]:checked`);
+        const resEl = document.getElementById(`mc-res${i}`);
+        const correctEl = document.getElementById(`mc-correct${i}`);
+        if (!selected) {
+          resEl.textContent = "❓";
+          resEl.className = "";
+          correctEl.style.display = "block";
+          allCorrect = false;
+        } else {
+          const isCorrect = (parseInt(selected.value) === item.ans);
+          resEl.textContent = isCorrect ? "✅" : "❌";
+          resEl.className = isCorrect ? "correct" : "incorrect";
+          correctEl.style.display = isCorrect ? "none" : "block";
+          if (!isCorrect) allCorrect = false;
+        }
+      });
+      playSound(allCorrect ? 'correct' : 'wrong');
+    }
+
+    // Initialize
+    document.addEventListener("DOMContentLoaded", () => {
+      renderFillBlanks();
+      renderDraggableList();
+      renderTF();
+      renderMC();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌟 Present Simple + Frequency Adverbs Quiz</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: pulse 2s infinite alternate;
+        }
+
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.02); }
+        }
+
+        .info-box {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .info-title {
+            font-size: 1.4em;
+            margin-bottom: 15px;
+            text-align: center;
+            color: #fff;
+        }
+
+        .rule {
+            text-align: center;
+            font-style: italic;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .frequency-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .freq-bar {
+            height: 30px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 15px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            transition: transform 0.3s ease;
+        }
+
+        .freq-bar:hover {
+            transform: scaleX(1.02);
+        }
+
+        .always { background: linear-gradient(90deg, #FF5F6D, #FF9A8B); }
+        .usually { background: linear-gradient(90deg, #FFC371, #FF5F6D); }
+        .frequently { background: linear-gradient(90deg, #FF9A8B, #FF5F6D); }
+        .often { background: linear-gradient(90deg, #4CD964, #5AC8FA); }
+        .sometimes { background: linear-gradient(90deg, #FFCC00, #FF9500); }
+        .seldom { background: linear-gradient(90deg, #3498DB, #2980B9); }
+        .rarely { background: linear-gradient(90deg, #9B59B6, #8E44AD); }
+        .never { background: linear-gradient(90deg, #E74C3C, #C0392B); }
+
+        .question {
+            background: rgba(255,255,255,0.15);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .question:hover {
+            transform: translateY(-5px);
+        }
+
+        .question-number {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #FFF;
+            margin-bottom: 10px;
+        }
+
+        .options {
+            display: grid;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .option {
+            padding: 12px 15px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            font-weight: 500;
+        }
+
+        .option:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateX(5px);
+        }
+
+        .correct {
+            background: linear-gradient(90deg, #4CD964, #5AC8FA) !important;
+            border-color: #2ECC71 !important;
+            color: white !important;
+            animation: correctPulse 0.5s ease-in-out;
+        }
+
+        .incorrect {
+            background: linear-gradient(90deg, #E74C3C, #C0392B) !important;
+            border-color: #C0392B !important;
+            color: white !important;
+            animation: incorrectPulse 0.5s ease-in-out;
+        }
+
+        @keyframes correctPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes incorrectPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(0.95); }
+            100% { transform: scale(1); }
+        }
+
+        .feedback {
+            margin-top: 10px;
+            font-weight: bold;
+            display: none;
+            padding: 10px;
+            border-radius: 8px;
+            background: rgba(0,0,0,0.3);
+        }
+
+        .score {
+            text-align: center;
+            font-size: 1.5em;
+            margin-top: 20px;
+            font-weight: bold;
+            padding: 15px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .confetti {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .confetti-piece {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #fff;
+            opacity: 0.7;
+            animation: fall 3s linear forwards;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌟 Present Simple + Frequency Adverbs</h1>
+
+        <div class="info-box">
+            <div class="info-title">📊 How often do you do things?</div>
+            <div class="rule">We use the Present Simple for habits and routines. Frequency adverbs tell us how often!</div>
+            <div class="frequency-chart">
+                <div class="freq-bar always">always — 100%</div>
+                <div class="freq-bar usually">usually — 90%</div>
+                <div class="freq-bar frequently">frequently — 80%</div>
+                <div class="freq-bar often">often — 70%</div>
+                <div class="freq-bar sometimes">sometimes — 50%</div>
+                <div class="freq-bar seldom">seldom — 10%</div>
+                <div class="freq-bar rarely">rarely — 5%</div>
+                <div class="freq-bar never">never — 0%</div>
+            </div>
+        </div>
+
+        <div id="quiz"></div>
+        <div class="score" id="score">Correct answers: 0 out of 15</div>
+    </div>
+
+    <div class="confetti" id="confetti"></div>
+
+    <script>
+        const questions = [
+            { question: "I ___ coffee every morning.", options: ["have", "has", "having", "am having"], correct: 0 },
+            { question: "She ___ TV in the evening, but not every day.", options: ["watch", "watches", "watching", "is watching"], correct: 1 },
+            { question: "We ___ tennis on weekends. It’s our favourite hobby!", options: ["play", "plays", "playing", "are playing"], correct: 0 },
+            { question: "He ___ running in the park. He does it every day!", options: ["go", "goes", "going", "is going"], correct: 1 },
+            { question: "They ___ newspapers every Sunday.", options: ["read", "reads", "reading", "are reading"], correct: 0 },
+            { question: "I ___ to music while I’m cooking.", options: ["listen", "listens", "listening", "am listening"], correct: 0 },
+            { question: "My brother ___ exercise. He hates sports!", options: ["do", "does", "doesn’t do", "don’t do"], correct: 2 },
+            { question: "She ___ junk food. She prefers healthy meals.", options: ["eat", "eats", "doesn’t eat", "don’t eat"], correct: 2 },
+            { question: "I ___ join the group on Fridays. We meet at 6 PM.", options: ["always", "never", "sometimes", "rarely"], correct: 0 },
+            { question: "She ___ go jogging in the morning. Only when she feels energetic.", options: ["always", "usually", "sometimes", "never"], correct: 2 },
+            { question: "They ___ like being outside. They prefer staying at home.", options: ["always", "usually", "often", "don’t"], correct: 3 },
+            { question: "He ___ want to improve his English. That’s why he studies every day.", options: ["always", "never", "rarely", "doesn’t"], correct: 0 },
+            { question: "We ___ meet new people at parties. We’re very social!", options: ["never", "rarely", "often", "sometimes"], correct: 2 },
+            { question: "I ___ go out on weekdays. I’m too busy with work.", options: ["always", "usually", "never", "often"], correct: 2 },
+            { question: "You ___ go running in the mornings. It’s your routine!", options: ["always", "never", "rarely", "sometimes"], correct: 0 }
+        ];
+
+        let score = 0;
+
+        function renderQuiz() {
+            const quizContainer = document.getElementById('quiz');
+            quizContainer.innerHTML = '';
+
+            questions.forEach((q, index) => {
+                const qDiv = document.createElement('div');
+                qDiv.className = 'question';
+                qDiv.innerHTML = `
+                    <div class="question-number">Question ${index + 1}</div>
+                    ${q.question}<br>
+                    <div class="options">
+                        ${q.options.map((opt, i) => `
+                            <div class="option" onclick="checkAnswer(${index}, ${i})">${opt}</div>
+                        `).join('')}
+                    </div>
+                    <div class="feedback" id="feedback-${index}"></div>
+                `;
+                quizContainer.appendChild(qDiv);
+            });
+        }
+
+        function checkAnswer(qIndex, selected) {
+            const feedback = document.getElementById(`feedback-${qIndex}`);
+            const options = document.querySelectorAll(`.question:nth-child(${qIndex + 1}) .option`);
+
+            options.forEach(opt => opt.classList.remove('correct', 'incorrect'));
+
+            if (selected === questions[qIndex].correct) {
+                options[selected].classList.add('correct');
+                feedback.textContent = "✅ Correct!";
+                feedback.style.color = "#2ECC71";
+                score++;
+            } else {
+                options[selected].classList.add('incorrect');
+                options[questions[qIndex].correct].classList.add('correct');
+                feedback.textContent = "❌ Wrong. Correct answer: " + questions[qIndex].options[questions[qIndex].correct];
+                feedback.style.color = "#E74C3C";
+            }
+
+            feedback.style.display = "block";
+            document.getElementById('score').textContent = `Correct answers: ${score} out of ${questions.length}`;
+
+            if (score === questions.length) {
+                launchConfetti();
+            }
+        }
+
+        function launchConfetti() {
+            const confettiContainer = document.getElementById('confetti');
+            confettiContainer.innerHTML = '';
+            for (let i = 0; i < 100; i++) {
+                const piece = document.createElement('div');
+                piece.className = 'confetti-piece';
+                piece.style.left = Math.random() * 100 + 'vw';
+                piece.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                piece.style.background = ['#FF5F6D', '#FFCC00', '#4CD964', '#3498DB', '#9B59B6'][Math.floor(Math.random() * 5)];
+                confettiContainer.appendChild(piece);
+            }
+        }
+
+        window.onload = renderQuiz;
+    </script>
+</body>
+</html>

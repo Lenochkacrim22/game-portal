@@ -1,0 +1,1565 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>100 to 1 - Kids Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bubblegum+Sans&family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Comic Neue', cursive;
+            background-color: #f0f9ff;
+            overflow: hidden;
+        }
+        .game-title {
+            font-family: 'Bubblegum Sans', cursive;
+        }
+        .button {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+        }
+        .answer-reveal {
+            animation: popIn 0.5s ease-out;
+        }
+        .score-update {
+            animation: bounce 0.5s ease;
+        }
+        .correct-answer {
+            animation: correctPulse 0.5s ease;
+        }
+        .wrong-answer {
+            animation: wrongShake 0.5s ease;
+        }
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            70% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        @keyframes correctPulse {
+            0% { transform: scale(1); background-color: #4ade80; }
+            50% { transform: scale(1.1); background-color: #22c55e; }
+            100% { transform: scale(1); background-color: #4ade80; }
+        }
+        @keyframes wrongShake {
+            0%, 100% { transform: translateX(0); background-color: #f87171; }
+            25% { transform: translateX(-10px); background-color: #ef4444; }
+            75% { transform: translateX(10px); background-color: #ef4444; }
+        }
+        .category-card {
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .category-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+        }
+        .background-image {
+            background-image: url('https://comandante-event.ru/wp-content/uploads/2021/08/sto-k-odnomu-min.jpg');
+            background-size: cover;
+            background-position: center;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.15;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4 relative">
+    <div class="background-image"></div>
+    
+    <!-- Start Screen -->
+    <div id="start-screen" class="flex flex-col items-center justify-center w-full max-w-4xl">
+        <h1 class="game-title text-6xl md:text-7xl text-center font-bold mb-8 text-blue-600 drop-shadow-lg">100 to 1<br><span class="text-pink-500">Kids Edition</span></h1>
+        
+        <div class="flex flex-col items-center bg-white bg-opacity-90 rounded-3xl p-8 shadow-xl w-full max-w-2xl">
+            <div class="flex gap-8 mb-8">
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-blue-500 rounded-full flex items-center justify-center mb-2">
+                        <span class="text-white text-4xl">A</span>
+                    </div>
+                    <p class="font-bold text-blue-500">Team A</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-pink-500 rounded-full flex items-center justify-center mb-2">
+                        <span class="text-white text-4xl">B</span>
+                    </div>
+                    <p class="font-bold text-pink-500">Team B</p>
+                </div>
+            </div>
+            
+            <p class="text-xl text-center mb-8">Choose a category to start playing!</p>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <div class="category-card bg-green-100 p-4 rounded-xl shadow-md cursor-pointer text-center" onclick="selectCategory('Food')">
+                    <div class="text-4xl mb-2">🍎</div>
+                    <p class="font-bold">Food</p>
+                </div>
+                <div class="category-card bg-blue-100 p-4 rounded-xl shadow-md cursor-pointer text-center" onclick="selectCategory('Animals')">
+                    <div class="text-4xl mb-2">🐶</div>
+                    <p class="font-bold">Animals</p>
+                </div>
+                <div class="category-card bg-yellow-100 p-4 rounded-xl shadow-md cursor-pointer text-center" onclick="selectCategory('School')">
+                    <div class="text-4xl mb-2">📚</div>
+                    <p class="font-bold">School</p>
+                </div>
+                <div class="category-card bg-purple-100 p-4 rounded-xl shadow-md cursor-pointer text-center" onclick="selectCategory('Toys')">
+                    <div class="text-4xl mb-2">🧸</div>
+                    <p class="font-bold">Toys</p>
+                </div>
+                <div class="category-card bg-red-100 p-4 rounded-xl shadow-md cursor-pointer text-center" onclick="selectCategory('Family')">
+                    <div class="text-4xl mb-2">👪</div>
+                    <p class="font-bold">Family</p>
+                </div>
+                <div class="category-card bg-orange-100 p-4 rounded-xl shadow-md cursor-pointer text-center" onclick="selectCategory('Sports')">
+                    <div class="text-4xl mb-2">⚽</div>
+                    <p class="font-bold">Sports</p>
+                </div>
+                <div class="category-card bg-teal-100 p-4 rounded-xl shadow-md cursor-pointer text-center" onclick="selectCategory('Hobbies')">
+                    <div class="text-4xl mb-2">🎨</div>
+                    <p class="font-bold">Hobbies</p>
+                </div>
+                <div class="category-card bg-indigo-100 p-4 rounded-xl shadow-md cursor-pointer text-center" onclick="selectCategory('Daily Actions')">
+                    <div class="text-4xl mb-2">🚶</div>
+                    <p class="font-bold">Daily Actions</p>
+                </div>
+            </div>
+            
+            <button class="button bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-bold py-3 px-8 rounded-full text-xl shadow-lg" onclick="showRules()">
+                How to Play
+            </button>
+        </div>
+    </div>
+    
+    <!-- Rules Screen -->
+    <div id="rules-screen" class="hidden flex flex-col items-center justify-center w-full max-w-4xl">
+        <div class="bg-white bg-opacity-90 rounded-3xl p-8 shadow-xl w-full max-w-2xl">
+            <h2 class="game-title text-4xl text-center font-bold mb-6 text-purple-600">How to Play</h2>
+            
+            <div class="mb-6">
+                <h3 class="text-2xl font-bold text-blue-600 mb-2">Game Rules:</h3>
+                <ul class="list-disc pl-6 space-y-2">
+                    <li>Two teams (Team A and Team B) play alternately.</li>
+                    <li>There are 3 rounds with 5 questions each.</li>
+                    <li>Each question has 7 possible answers.</li>
+                    <li>Try to guess the most popular answers from a kid survey!</li>
+                    <li>Each team has 3 tries per question.</li>
+                    <li>If all 3 guesses are wrong, the other team gets a chance to steal the points!</li>
+                </ul>
+            </div>
+            
+            <div class="mb-6">
+                <h3 class="text-2xl font-bold text-pink-600 mb-2">Scoring:</h3>
+                <ul class="list-disc pl-6 space-y-2">
+                    <li><strong>Round 1:</strong> Most popular answer = Most points (Total: 100 points)</li>
+                    <li><strong>Round 2:</strong> Same as Round 1, but points are doubled! (Total: 200 points)</li>
+                    <li><strong>Round 3:</strong> Reverse scoring - least popular answer = most points! (Total: 300 points)</li>
+                </ul>
+            </div>
+            
+            <div class="flex justify-center">
+                <button class="button bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-full text-xl shadow-lg" onclick="backToStart()">
+                    Got it!
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Round Info Screen -->
+    <div id="round-info-screen" class="hidden flex flex-col items-center justify-center w-full max-w-4xl">
+        <div class="bg-white bg-opacity-90 rounded-3xl p-8 shadow-xl w-full max-w-2xl">
+            <h2 id="round-info-title" class="game-title text-4xl text-center font-bold mb-6 text-purple-600">Round 1</h2>
+            
+            <div id="round-info-content" class="mb-8 text-center text-xl">
+                <!-- Content will be filled dynamically -->
+            </div>
+            
+            <div class="flex justify-center">
+                <button class="button bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-8 rounded-full text-xl shadow-lg" onclick="startRound()">
+                    Let's Play!
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Game Screen -->
+    <div id="game-screen" class="hidden flex flex-col items-center justify-center w-full max-w-5xl">
+        <div class="flex justify-between items-center w-full mb-4">
+            <div class="bg-blue-500 text-white px-6 py-3 rounded-xl shadow-md">
+                <p class="font-bold">Team A</p>
+                <p id="team-a-score" class="text-2xl font-bold">0</p>
+            </div>
+            
+            <div id="round-display" class="bg-purple-500 text-white px-6 py-3 rounded-xl shadow-md">
+                <p class="font-bold text-center">Round</p>
+                <p id="current-round" class="text-2xl font-bold text-center">1</p>
+            </div>
+            
+            <div class="bg-pink-500 text-white px-6 py-3 rounded-xl shadow-md">
+                <p class="font-bold">Team B</p>
+                <p id="team-b-score" class="text-2xl font-bold">0</p>
+            </div>
+        </div>
+        
+        <div class="bg-white bg-opacity-90 rounded-3xl p-6 shadow-xl w-full">
+            <div class="flex justify-between items-center mb-4">
+                <div id="current-team" class="bg-blue-500 text-white px-4 py-2 rounded-lg font-bold">
+                    Team A's Turn
+                </div>
+                <div id="errors-counter" class="bg-red-500 text-white px-4 py-2 rounded-lg font-bold">
+                    Errors: 0/3
+                </div>
+            </div>
+            
+            <h2 id="question-text" class="text-2xl md:text-3xl font-bold text-center mb-6 text-gray-800">
+                Name a fruit that kids love to eat
+            </h2>
+            
+            <div id="answers-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <!-- Answers will be filled dynamically -->
+                <div class="bg-gray-200 rounded-lg p-4 flex justify-between items-center">
+                    <div class="flex items-center">
+                        <span class="bg-yellow-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-3">1</span>
+                        <span class="answer-text">?????</span>
+                    </div>
+                    <span class="points-text font-bold">??</span>
+                </div>
+                <div class="bg-gray-200 rounded-lg p-4 flex justify-between items-center">
+                    <div class="flex items-center">
+                        <span class="bg-yellow-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-3">2</span>
+                        <span class="answer-text">?????</span>
+                    </div>
+                    <span class="points-text font-bold">??</span>
+                </div>
+                <div class="bg-gray-200 rounded-lg p-4 flex justify-between items-center">
+                    <div class="flex items-center">
+                        <span class="bg-yellow-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-3">3</span>
+                        <span class="answer-text">?????</span>
+                    </div>
+                    <span class="points-text font-bold">??</span>
+                </div>
+                <div class="bg-gray-200 rounded-lg p-4 flex justify-between items-center">
+                    <div class="flex items-center">
+                        <span class="bg-yellow-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-3">4</span>
+                        <span class="answer-text">?????</span>
+                    </div>
+                    <span class="points-text font-bold">??</span>
+                </div>
+                <div class="bg-gray-200 rounded-lg p-4 flex justify-between items-center">
+                    <div class="flex items-center">
+                        <span class="bg-yellow-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-3">5</span>
+                        <span class="answer-text">?????</span>
+                    </div>
+                    <span class="points-text font-bold">??</span>
+                </div>
+                <div class="bg-gray-200 rounded-lg p-4 flex justify-between items-center">
+                    <div class="flex items-center">
+                        <span class="bg-yellow-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-3">6</span>
+                        <span class="answer-text">?????</span>
+                    </div>
+                    <span class="points-text font-bold">??</span>
+                </div>
+                <div class="bg-gray-200 rounded-lg p-4 flex justify-between items-center md:col-span-2">
+                    <div class="flex items-center">
+                        <span class="bg-yellow-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-3">7</span>
+                        <span class="answer-text">?????</span>
+                    </div>
+                    <span class="points-text font-bold">??</span>
+                </div>
+            </div>
+            
+            <div class="flex flex-col md:flex-row gap-4 justify-center mb-6">
+                <input type="text" id="answer-input" placeholder="Type your answer..." class="border-2 border-gray-300 rounded-lg px-4 py-3 text-lg w-full md:w-2/3 focus:outline-none focus:border-blue-500">
+                <button id="submit-button" class="button bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg text-lg" onclick="submitAnswer()">
+                    Submit
+                </button>
+            </div>
+            
+            <div class="flex flex-wrap justify-center gap-4">
+                <button id="show-answers-button" class="button bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 px-6 rounded-lg text-lg" onclick="showAllAnswers()">
+                    Show Answers
+                </button>
+                <button id="switch-team-button" class="button bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-6 rounded-lg text-lg" onclick="switchTeam()">
+                    Switch Team
+                </button>
+                <button id="next-question-button" class="button bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg text-lg" onclick="nextQuestion()">
+                    Next Question
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Final Results Screen -->
+    <div id="results-screen" class="hidden flex flex-col items-center justify-center w-full max-w-4xl">
+        <div class="bg-white bg-opacity-90 rounded-3xl p-8 shadow-xl w-full max-w-2xl">
+            <h2 class="game-title text-4xl text-center font-bold mb-6 text-purple-600">Game Over!</h2>
+            
+            <div id="final-scores" class="flex justify-around mb-8">
+                <div class="text-center">
+                    <div class="w-24 h-24 bg-blue-500 rounded-full flex items-center justify-center mb-2">
+                        <span class="text-white text-5xl">A</span>
+                    </div>
+                    <p class="font-bold text-blue-500">Team A</p>
+                    <p id="final-score-a" class="text-3xl font-bold">0</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-24 h-24 bg-pink-500 rounded-full flex items-center justify-center mb-2">
+                        <span class="text-white text-5xl">B</span>
+                    </div>
+                    <p class="font-bold text-pink-500">Team B</p>
+                    <p id="final-score-b" class="text-3xl font-bold">0</p>
+                </div>
+            </div>
+            
+            <div id="winner-announcement" class="text-center text-2xl font-bold mb-8">
+                <!-- Will be filled dynamically -->
+            </div>
+            
+            <div class="flex justify-center">
+                <button class="button bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-full text-xl shadow-lg" onclick="restartGame()">
+                    Play Again
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game data
+        const gameData = {
+            Food: {
+                round1: [
+                    {
+                        question: "Name a fruit that kids love to eat",
+                        answers: [
+                            { text: "Apple", points: 30 },
+                            { text: "Banana", points: 25 },
+                            { text: "Strawberry", points: 20 },
+                            { text: "Orange", points: 10 },
+                            { text: "Grapes", points: 8 },
+                            { text: "Watermelon", points: 5 },
+                            { text: "Pineapple", points: 2 }
+                        ]
+                    },
+                    {
+                        question: "Name a vegetable that kids don't like",
+                        answers: [
+                            { text: "Broccoli", points: 30 },
+                            { text: "Brussels sprouts", points: 25 },
+                            { text: "Spinach", points: 20 },
+                            { text: "Carrots", points: 10 },
+                            { text: "Peas", points: 8 },
+                            { text: "Onions", points: 5 },
+                            { text: "Tomatoes", points: 2 }
+                        ]
+                    },
+                    {
+                        question: "Name a food kids like for breakfast",
+                        answers: [
+                            { text: "Pancakes", points: 30 },
+                            { text: "Cereal", points: 25 },
+                            { text: "Eggs", points: 20 },
+                            { text: "Toast", points: 10 },
+                            { text: "Waffles", points: 8 },
+                            { text: "Yogurt", points: 5 },
+                            { text: "Fruit", points: 2 }
+                        ]
+                    }
+                ],
+                round2: [
+                    {
+                        question: "Name a sweet treat kids ask for",
+                        answers: [
+                            { text: "Ice cream", points: 60 },
+                            { text: "Chocolate", points: 50 },
+                            { text: "Candy", points: 40 },
+                            { text: "Cookies", points: 20 },
+                            { text: "Cake", points: 16 },
+                            { text: "Donuts", points: 10 },
+                            { text: "Cupcakes", points: 4 }
+                        ]
+                    },
+                    {
+                        question: "Name a drink kids love",
+                        answers: [
+                            { text: "Juice", points: 60 },
+                            { text: "Soda", points: 50 },
+                            { text: "Milk", points: 40 },
+                            { text: "Chocolate milk", points: 20 },
+                            { text: "Smoothie", points: 16 },
+                            { text: "Lemonade", points: 10 },
+                            { text: "Water", points: 4 }
+                        ]
+                    },
+                    {
+                        question: "Name a food kids like to eat at a party",
+                        answers: [
+                            { text: "Pizza", points: 60 },
+                            { text: "Chips", points: 50 },
+                            { text: "Cake", points: 40 },
+                            { text: "Hot dogs", points: 20 },
+                            { text: "Ice cream", points: 16 },
+                            { text: "Cookies", points: 10 },
+                            { text: "Candy", points: 4 }
+                        ]
+                    }
+                ],
+                round3: [
+                    {
+                        question: "Name a food kids might cook by themselves",
+                        answers: [
+                            { text: "Soup", points: 100 },
+                            { text: "Pasta", points: 80 },
+                            { text: "Sandwich", points: 60 },
+                            { text: "Toast", points: 30 },
+                            { text: "Eggs", points: 20 },
+                            { text: "Cereal", points: 8 },
+                            { text: "Microwave meal", points: 2 }
+                        ]
+                    },
+                    {
+                        question: "Name a food kids eat with their hands",
+                        answers: [
+                            { text: "Tacos", points: 100 },
+                            { text: "Burgers", points: 80 },
+                            { text: "Chicken nuggets", points: 60 },
+                            { text: "Fries", points: 30 },
+                            { text: "Pizza", points: 20 },
+                            { text: "Sandwiches", points: 8 },
+                            { text: "Fruit", points: 2 }
+                        ]
+                    },
+                    {
+                        question: "Name a food kids might find in their lunch box",
+                        answers: [
+                            { text: "Crackers", points: 100 },
+                            { text: "Cheese", points: 80 },
+                            { text: "Yogurt", points: 60 },
+                            { text: "Fruit", points: 30 },
+                            { text: "Sandwich", points: 20 },
+                            { text: "Chips", points: 8 },
+                            { text: "Cookies", points: 2 }
+                        ]
+                    }
+                ]
+            },
+            Animals: {
+                round1: [
+                    {
+                        question: "Name an animal kids want as a pet",
+                        answers: [
+                            { text: "Dog", points: 30 },
+                            { text: "Cat", points: 25 },
+                            { text: "Rabbit", points: 20 },
+                            { text: "Hamster", points: 10 },
+                            { text: "Fish", points: 8 },
+                            { text: "Bird", points: 5 },
+                            { text: "Turtle", points: 2 }
+                        ]
+                    },
+                    {
+                        question: "Name an animal at the zoo kids love to see",
+                        answers: [
+                            { text: "Lion", points: 30 },
+                            { text: "Elephant", points: 25 },
+                            { text: "Monkey", points: 20 },
+                            { text: "Giraffe", points: 10 },
+                            { text: "Penguin", points: 8 },
+                            { text: "Tiger", points: 5 },
+                            { text: "Zebra", points: 2 }
+                        ]
+                    },
+                    {
+                        question: "Name an animal that can swim",
+                        answers: [
+                            { text: "Fish", points: 30 },
+                            { text: "Dolphin", points: 25 },
+                            { text: "Shark", points: 20 },
+                            { text: "Duck", points: 10 },
+                            { text: "Turtle", points: 8 },
+                            { text: "Frog", points: 5 },
+                            { text: "Whale", points: 2 }
+                        ]
+                    }
+                ],
+                round2: [
+                    {
+                        question: "Name an animal that is very big",
+                        answers: [
+                            { text: "Elephant", points: 60 },
+                            { text: "Whale", points: 50 },
+                            { text: "Giraffe", points: 40 },
+                            { text: "Hippo", points: 20 },
+                            { text: "Bear", points: 16 },
+                            { text: "Horse", points: 10 },
+                            { text: "Cow", points: 4 }
+                        ]
+                    },
+                    {
+                        question: "Name an animal that is very fast",
+                        answers: [
+                            { text: "Cheetah", points: 60 },
+                            { text: "Horse", points: 50 },
+                            { text: "Rabbit", points: 40 },
+                            { text: "Dog", points: 20 },
+                            { text: "Lion", points: 16 },
+                            { text: "Deer", points: 10 },
+                            { text: "Ostrich", points: 4 }
+                        ]
+                    },
+                    {
+                        question: "Name an animal that lives on a farm",
+                        answers: [
+                            { text: "Cow", points: 60 },
+                            { text: "Chicken", points: 50 },
+                            { text: "Pig", points: 40 },
+                            { text: "Horse", points: 20 },
+                            { text: "Sheep", points: 16 },
+                            { text: "Goat", points: 10 },
+                            { text: "Duck", points: 4 }
+                        ]
+                    }
+                ],
+                round3: [
+                    {
+                        question: "Name an animal that kids might be afraid of",
+                        answers: [
+                            { text: "Wolf", points: 100 },
+                            { text: "Crocodile", points: 80 },
+                            { text: "Bear", points: 60 },
+                            { text: "Lion", points: 30 },
+                            { text: "Spider", points: 20 },
+                            { text: "Snake", points: 8 },
+                            { text: "Shark", points: 2 }
+                        ]
+                    },
+                    {
+                        question: "Name an animal that can fly",
+                        answers: [
+                            { text: "Penguin", points: 100 },
+                            { text: "Ostrich", points: 80 },
+                            { text: "Butterfly", points: 60 },
+                            { text: "Bee", points: 30 },
+                            { text: "Eagle", points: 20 },
+                            { text: "Bird", points: 8 },
+                            { text: "Bat", points: 2 }
+                        ]
+                    },
+                    {
+                        question: "Name an animal that lives in the jungle",
+                        answers: [
+                            { text: "Sloth", points: 100 },
+                            { text: "Toucan", points: 80 },
+                            { text: "Parrot", points: 60 },
+                            { text: "Tiger", points: 30 },
+                            { text: "Monkey", points: 20 },
+                            { text: "Snake", points: 8 },
+                            { text: "Lion", points: 2 }
+                        ]
+                    }
+                ]
+            },
+            // More categories with similar structure
+            Family: {
+                round1: [
+                    {
+                        question: "Name someone in a family kids like to play with",
+                        answers: [
+                            { text: "Brother", points: 30 },
+                            { text: "Sister", points: 25 },
+                            { text: "Dad", points: 20 },
+                            { text: "Mom", points: 10 },
+                            { text: "Cousin", points: 8 },
+                            { text: "Grandpa", points: 5 },
+                            { text: "Uncle", points: 2 }
+                        ]
+                    },
+                    {
+                        question: "Name something families do together on weekends",
+                        answers: [
+                            { text: "Watch movies", points: 30 },
+                            { text: "Go to park", points: 25 },
+                            { text: "Eat out", points: 20 },
+                            { text: "Play games", points: 10 },
+                            { text: "Visit family", points: 8 },
+                            { text: "Shopping", points: 5 },
+                            { text: "Sports", points: 2 }
+                        ]
+                    },
+                    {
+                        question: "Name a place families go on vacation",
+                        answers: [
+                            { text: "Beach", points: 30 },
+                            { text: "Disney", points: 25 },
+                            { text: "Camping", points: 20 },
+                            { text: "Grandparents", points: 10 },
+                            { text: "Water park", points: 8 },
+                            { text: "Mountains", points: 5 },
+                            { text: "Zoo", points: 2 }
+                        ]
+                    }
+                ],
+                round2: [
+                    {
+                        question: "Name something parents tell kids to do",
+                        answers: [
+                            { text: "Clean room", points: 60 },
+                            { text: "Do homework", points: 50 },
+                            { text: "Brush teeth", points: 40 },
+                            { text: "Eat vegetables", points: 20 },
+                            { text: "Go to bed", points: 16 },
+                            { text: "Take bath", points: 10 },
+                            { text: "Be quiet", points: 4 }
+                        ]
+                    },
+                    {
+                        question: "Name a job parents do at home",
+                        answers: [
+                            { text: "Cooking", points: 60 },
+                            { text: "Cleaning", points: 50 },
+                            { text: "Laundry", points: 40 },
+                            { text: "Dishes", points: 20 },
+                            { text: "Shopping", points: 16 },
+                            { text: "Gardening", points: 10 },
+                            { text: "Fixing things", points: 4 }
+                        ]
+                    },
+                    {
+                        question: "Name something kids help with at home",
+                        answers: [
+                            { text: "Set table", points: 60 },
+                            { text: "Feed pet", points: 50 },
+                            { text: "Make bed", points: 40 },
+                            { text: "Clean room", points: 20 },
+                            { text: "Dishes", points: 16 },
+                            { text: "Take out trash", points: 10 },
+                            { text: "Dusting", points: 4 }
+                        ]
+                    }
+                ],
+                round3: [
+                    {
+                        question: "Name something grandparents give to kids",
+                        answers: [
+                            { text: "Money", points: 100 },
+                            { text: "Books", points: 80 },
+                            { text: "Clothes", points: 60 },
+                            { text: "Toys", points: 30 },
+                            { text: "Candy", points: 20 },
+                            { text: "Hugs", points: 8 },
+                            { text: "Cookies", points: 2 }
+                        ]
+                    },
+                    {
+                        question: "Name something families argue about",
+                        answers: [
+                            { text: "Chores", points: 100 },
+                            { text: "TV shows", points: 80 },
+                            { text: "Bedtime", points: 60 },
+                            { text: "Food", points: 30 },
+                            { text: "Toys", points: 20 },
+                            { text: "Screen time", points: 8 },
+                            { text: "Bathroom time", points: 2 }
+                        ]
+                    },
+                    {
+                        question: "Name something families take pictures of",
+                        answers: [
+                            { text: "New baby", points: 100 },
+                            { text: "New pet", points: 80 },
+                            { text: "Birthday", points: 60 },
+                            { text: "Vacation", points: 30 },
+                            { text: "Holidays", points: 20 },
+                            { text: "First day of school", points: 8 },
+                            { text: "Family gatherings", points: 2 }
+                        ]
+                    }
+                ]
+            },
+            // Add more categories with similar structure
+            Sports: {
+                round1: [
+                    {
+                        question: "Name a sport kids play at school",
+                        answers: [
+                            { text: "Soccer", points: 30 },
+                            { text: "Basketball", points: 25 },
+                            { text: "Dodgeball", points: 20 },
+                            { text: "Running", points: 10 },
+                            { text: "Volleyball", points: 8 },
+                            { text: "Baseball", points: 5 },
+                            { text: "Jump rope", points: 2 }
+                        ]
+                    },
+                    {
+                        question: "Name something you need to play sports",
+                        answers: [
+                            { text: "Ball", points: 30 },
+                            { text: "Shoes", points: 25 },
+                            { text: "Friends", points: 20 },
+                            { text: "Field/Court", points: 10 },
+                            { text: "Energy", points: 8 },
+                            { text: "Water", points: 5 },
+                            { text: "Coach", points: 2 }
+                        ]
+                    },
+                    {
+                        question: "Name a winter sport",
+                        answers: [
+                            { text: "Skiing", points: 30 },
+                            { text: "Ice skating", points: 25 },
+                            { text: "Snowboarding", points: 20 },
+                            { text: "Hockey", points: 10 },
+                            { text: "Sledding", points: 8 },
+                            { text: "Snowball fight", points: 5 },
+                            { text: "Snowman building", points: 2 }
+                        ]
+                    }
+                ],
+                round2: [
+                    {
+                        question: "Name a sport played with a ball",
+                        answers: [
+                            { text: "Soccer", points: 60 },
+                            { text: "Basketball", points: 50 },
+                            { text: "Baseball", points: 40 },
+                            { text: "Tennis", points: 20 },
+                            { text: "Volleyball", points: 16 },
+                            { text: "Football", points: 10 },
+                            { text: "Golf", points: 4 }
+                        ]
+                    },
+                    {
+                        question: "Name a sport kids watch on TV",
+                        answers: [
+                            { text: "Soccer", points: 60 },
+                            { text: "Basketball", points: 50 },
+                            { text: "Football", points: 40 },
+                            { text: "Baseball", points: 20 },
+                            { text: "Olympics", points: 16 },
+                            { text: "Hockey", points: 10 },
+                            { text: "Racing", points: 4 }
+                        ]
+                    },
+                    {
+                        question: "Name something that can happen when playing sports",
+                        answers: [
+                            { text: "Fall down", points: 60 },
+                            { text: "Win", points: 50 },
+                            { text: "Lose", points: 40 },
+                            { text: "Get tired", points: 20 },
+                            { text: "Score points", points: 16 },
+                            { text: "Make friends", points: 10 },
+                            { text: "Have fun", points: 4 }
+                        ]
+                    }
+                ],
+                round3: [
+                    {
+                        question: "Name a sport played in water",
+                        answers: [
+                            { text: "Water polo", points: 100 },
+                            { text: "Diving", points: 80 },
+                            { text: "Surfing", points: 60 },
+                            { text: "Water skiing", points: 30 },
+                            { text: "Swimming", points: 20 },
+                            { text: "Snorkeling", points: 8 },
+                            { text: "Fishing", points: 2 }
+                        ]
+                    },
+                    {
+                        question: "Name something athletes wear",
+                        answers: [
+                            { text: "Helmet", points: 100 },
+                            { text: "Knee pads", points: 80 },
+                            { text: "Gloves", points: 60 },
+                            { text: "Uniform", points: 30 },
+                            { text: "Shoes", points: 20 },
+                            { text: "Socks", points: 8 },
+                            { text: "Jersey", points: 2 }
+                        ]
+                    },
+                    {
+                        question: "Name a famous athlete kids know",
+                        answers: [
+                            { text: "Gymnast", points: 100 },
+                            { text: "Tennis player", points: 80 },
+                            { text: "Swimmer", points: 60 },
+                            { text: "Soccer player", points: 30 },
+                            { text: "Basketball player", points: 20 },
+                            { text: "Football player", points: 8 },
+                            { text: "Baseball player", points: 2 }
+                        ]
+                    }
+                ]
+            },
+            School: {
+                round1: [
+                    {
+                        question: "Name a subject kids learn at school",
+                        answers: [
+                            { text: "Math", points: 30 },
+                            { text: "Reading", points: 25 },
+                            { text: "Science", points: 20 },
+                            { text: "Art", points: 10 },
+                            { text: "Music", points: 8 },
+                            { text: "PE", points: 5 },
+                            { text: "History", points: 2 }
+                        ]
+                    },
+                    {
+                        question: "Name something kids bring to school",
+                        answers: [
+                            { text: "Backpack", points: 30 },
+                            { text: "Lunch", points: 25 },
+                            { text: "Pencils", points: 20 },
+                            { text: "Books", points: 10 },
+                            { text: "Homework", points: 8 },
+                            { text: "Water bottle", points: 5 },
+                            { text: "Snack", points: 2 }
+                        ]
+                    },
+                    {
+                        question: "Name a place in a school",
+                        answers: [
+                            { text: "Classroom", points: 30 },
+                            { text: "Playground", points: 25 },
+                            { text: "Cafeteria", points: 20 },
+                            { text: "Gym", points: 10 },
+                            { text: "Library", points: 8 },
+                            { text: "Office", points: 5 },
+                            { text: "Bathroom", points: 2 }
+                        ]
+                    }
+                ],
+                round2: [
+                    {
+                        question: "Name something kids do at recess",
+                        answers: [
+                            { text: "Play tag", points: 60 },
+                            { text: "Swing", points: 50 },
+                            { text: "Slide", points: 40 },
+                            { text: "Jump rope", points: 20 },
+                            { text: "Talk with friends", points: 16 },
+                            { text: "Play ball", points: 10 },
+                            { text: "Eat snack", points: 4 }
+                        ]
+                    },
+                    {
+                        question: "Name something kids learn in first grade",
+                        answers: [
+                            { text: "Reading", points: 60 },
+                            { text: "Writing", points: 50 },
+                            { text: "Counting", points: 40 },
+                            { text: "Alphabet", points: 20 },
+                            { text: "Colors", points: 16 },
+                            { text: "Shapes", points: 10 },
+                            { text: "Sharing", points: 4 }
+                        ]
+                    },
+                    {
+                        question: "Name something a teacher does",
+                        answers: [
+                            { text: "Teach", points: 60 },
+                            { text: "Grade papers", points: 50 },
+                            { text: "Help students", points: 40 },
+                            { text: "Read stories", points: 20 },
+                            { text: "Give homework", points: 16 },
+                            { text: "Write on board", points: 10 },
+                            { text: "Take attendance", points: 4 }
+                        ]
+                    }
+                ],
+                round3: [
+                    {
+                        question: "Name something kids don't like about school",
+                        answers: [
+                            { text: "Waking up early", points: 100 },
+                            { text: "Pop quizzes", points: 80 },
+                            { text: "Detention", points: 60 },
+                            { text: "Tests", points: 30 },
+                            { text: "Homework", points: 20 },
+                            { text: "Rules", points: 8 },
+                            { text: "Bullies", points: 2 }
+                        ]
+                    },
+                    {
+                        question: "Name something kids do on the school bus",
+                        answers: [
+                            { text: "Homework", points: 100 },
+                            { text: "Read", points: 80 },
+                            { text: "Sleep", points: 60 },
+                            { text: "Look out window", points: 30 },
+                            { text: "Talk", points: 20 },
+                            { text: "Listen to music", points: 8 },
+                            { text: "Sit", points: 2 }
+                        ]
+                    },
+                    {
+                        question: "Name a school supply",
+                        answers: [
+                            { text: "Stapler", points: 100 },
+                            { text: "Ruler", points: 80 },
+                            { text: "Glue", points: 60 },
+                            { text: "Scissors", points: 30 },
+                            { text: "Pencil", points: 20 },
+                            { text: "Paper", points: 8 },
+                            { text: "Eraser", points: 2 }
+                        ]
+                    }
+                ]
+            },
+            Hobbies: {
+                round1: [
+                    {
+                        question: "Name a hobby kids enjoy",
+                        answers: [
+                            { text: "Drawing", points: 30 },
+                            { text: "Reading", points: 25 },
+                            { text: "Sports", points: 20 },
+                            { text: "Video games", points: 10 },
+                            { text: "Dancing", points: 8 },
+                            { text: "Singing", points: 5 },
+                            { text: "Collecting", points: 2 }
+                        ]
+                    },
+                    {
+                        question: "Name something kids collect",
+                        answers: [
+                            { text: "Rocks", points: 30 },
+                            { text: "Cards", points: 25 },
+                            { text: "Toys", points: 20 },
+                            { text: "Stickers", points: 10 },
+                            { text: "Shells", points: 8 },
+                            { text: "Coins", points: 5 },
+                            { text: "Stamps", points: 2 }
+                        ]
+                    },
+                    {
+                        question: "Name an outdoor activity kids like",
+                        answers: [
+                            { text: "Biking", points: 30 },
+                            { text: "Swimming", points: 25 },
+                            { text: "Running", points: 20 },
+                            { text: "Playing tag", points: 10 },
+                            { text: "Climbing trees", points: 8 },
+                            { text: "Hide and seek", points: 5 },
+                            { text: "Jumping rope", points: 2 }
+                        ]
+                    }
+                ],
+                round2: [
+                    {
+                        question: "Name something kids make with their hands",
+                        answers: [
+                            { text: "Drawings", points: 60 },
+                            { text: "Clay figures", points: 50 },
+                            { text: "Paper airplanes", points: 40 },
+                            { text: "Bracelets", points: 20 },
+                            { text: "Lego builds", points: 16 },
+                            { text: "Cards", points: 10 },
+                            { text: "Sandcastles", points: 4 }
+                        ]
+                    },
+                    {
+                        question: "Name a musical instrument kids learn",
+                        answers: [
+                            { text: "Piano", points: 60 },
+                            { text: "Guitar", points: 50 },
+                            { text: "Recorder", points: 40 },
+                            { text: "Drums", points: 20 },
+                            { text: "Violin", points: 16 },
+                            { text: "Flute", points: 10 },
+                            { text: "Ukulele", points: 4 }
+                        ]
+                    },
+                    {
+                        question: "Name something kids do on rainy days",
+                        answers: [
+                            { text: "Watch TV", points: 60 },
+                            { text: "Read books", points: 50 },
+                            { text: "Play board games", points: 40 },
+                            { text: "Draw", points: 20 },
+                            { text: "Build forts", points: 16 },
+                            { text: "Video games", points: 10 },
+                            { text: "Nap", points: 4 }
+                        ]
+                    }
+                ],
+                round3: [
+                    {
+                        question: "Name a hobby that costs no money",
+                        answers: [
+                            { text: "Cloud watching", points: 100 },
+                            { text: "Storytelling", points: 80 },
+                            { text: "Bird watching", points: 60 },
+                            { text: "Singing", points: 30 },
+                            { text: "Running", points: 20 },
+                            { text: "Drawing", points: 8 },
+                            { text: "Reading", points: 2 }
+                        ]
+                    },
+                    {
+                        question: "Name something kids learn in after-school clubs",
+                        answers: [
+                            { text: "Robotics", points: 100 },
+                            { text: "Chess", points: 80 },
+                            { text: "Cooking", points: 60 },
+                            { text: "Languages", points: 30 },
+                            { text: "Art", points: 20 },
+                            { text: "Sports", points: 8 },
+                            { text: "Music", points: 2 }
+                        ]
+                    },
+                    {
+                        question: "Name a hobby kids can do with friends",
+                        answers: [
+                            { text: "Trading cards", points: 100 },
+                            { text: "Building models", points: 80 },
+                            { text: "Gardening", points: 60 },
+                            { text: "Board games", points: 30 },
+                            { text: "Sports", points: 20 },
+                            { text: "Video games", points: 8 },
+                            { text: "Playing pretend", points: 2 }
+                        ]
+                    }
+                ]
+            },
+            Toys: {
+                round1: [
+                    {
+                        question: "Name a toy kids play with outside",
+                        answers: [
+                            { text: "Ball", points: 30 },
+                            { text: "Bike", points: 25 },
+                            { text: "Bubbles", points: 20 },
+                            { text: "Chalk", points: 10 },
+                            { text: "Jump rope", points: 8 },
+                            { text: "Frisbee", points: 5 },
+                            { text: "Kite", points: 2 }
+                        ]
+                    },
+                    {
+                        question: "Name a toy kids take to bed",
+                        answers: [
+                            { text: "Teddy bear", points: 30 },
+                            { text: "Doll", points: 25 },
+                            { text: "Stuffed animal", points: 20 },
+                            { text: "Blanket", points: 10 },
+                            { text: "Action figure", points: 8 },
+                            { text: "Book", points: 5 },
+                            { text: "Pillow pet", points: 2 }
+                        ]
+                    },
+                    {
+                        question: "Name a toy that makes noise",
+                        answers: [
+                            { text: "Drum", points: 30 },
+                            { text: "Toy car", points: 25 },
+                            { text: "Talking doll", points: 20 },
+                            { text: "Whistle", points: 10 },
+                            { text: "Toy phone", points: 8 },
+                            { text: "Keyboard", points: 5 },
+                            { text: "Rattle", points: 2 }
+                        ]
+                    }
+                ],
+                round2: [
+                    {
+                        question: "Name a toy kids build with",
+                        answers: [
+                            { text: "Lego", points: 60 },
+                            { text: "Blocks", points: 50 },
+                            { text: "Play-Doh", points: 40 },
+                            { text: "Magnetic tiles", points: 20 },
+                            { text: "Lincoln Logs", points: 16 },
+                            { text: "K'nex", points: 10 },
+                            { text: "Sticks", points: 4 }
+                        ]
+                    },
+                    {
+                        question: "Name a toy kids play with in water",
+                        answers: [
+                            { text: "Rubber duck", points: 60 },
+                            { text: "Water gun", points: 50 },
+                            { text: "Floaties", points: 40 },
+                            { text: "Boats", points: 20 },
+                            { text: "Beach ball", points: 16 },
+                            { text: "Diving rings", points: 10 },
+                            { text: "Squirt toys", points: 4 }
+                        ]
+                    },
+                    {
+                        question: "Name a toy kids play with at school",
+                        answers: [
+                            { text: "Playground equipment", points: 60 },
+                            { text: "Jump rope", points: 50 },
+                            { text: "Ball", points: 40 },
+                            { text: "Blocks", points: 20 },
+                            { text: "Puzzles", points: 16 },
+                            { text: "Board games", points: 10 },
+                            { text: "Crayons", points: 4 }
+                        ]
+                    }
+                ],
+                round3: [
+                    {
+                        question: "Name a toy that needs batteries",
+                        answers: [
+                            { text: "Robot", points: 100 },
+                            { text: "Remote control car", points: 80 },
+                            { text: "Electronic pet", points: 60 },
+                            { text: "Talking doll", points: 30 },
+                            { text: "Light-up toy", points: 20 },
+                            { text: "Video game", points: 8 },
+                            { text: "Flashlight", points: 2 }
+                        ]
+                    },
+                    {
+                        question: "Name a toy kids ask for on their birthday",
+                        answers: [
+                            { text: "Robot dog", points: 100 },
+                            { text: "Drone", points: 80 },
+                            { text: "Dollhouse", points: 60 },
+                            { text: "Bike", points: 30 },
+                            { text: "Video game", points: 20 },
+                            { text: "Action figure", points: 8 },
+                            { text: "Board game", points: 2 }
+                        ]
+                    },
+                    {
+                        question: "Name a toy that has been popular for many years",
+                        answers: [
+                            { text: "Yo-yo", points: 100 },
+                            { text: "Marbles", points: 80 },
+                            { text: "Jacks", points: 60 },
+                            { text: "Doll", points: 30 },
+                            { text: "Ball", points: 20 },
+                            { text: "Teddy bear", points: 8 },
+                            { text: "Blocks", points: 2 }
+                        ]
+                    }
+                ]
+            },
+            "Daily Actions": {
+                round1: [
+                    {
+                        question: "Name something kids do in the morning",
+                        answers: [
+                            { text: "Brush teeth", points: 30 },
+                            { text: "Eat breakfast", points: 25 },
+                            { text: "Get dressed", points: 20 },
+                            { text: "Wake up", points: 10 },
+                            { text: "Go to school", points: 8 },
+                            { text: "Make bed", points: 5 },
+                            { text: "Pack lunch", points: 2 }
+                        ]
+                    },
+                    {
+                        question: "Name something kids do after school",
+                        answers: [
+                            { text: "Homework", points: 30 },
+                            { text: "Play", points: 25 },
+                            { text: "Snack", points: 20 },
+                            { text: "Watch TV", points: 10 },
+                            { text: "Sports", points: 8 },
+                            { text: "Talk to friends", points: 5 },
+                            { text: "Rest", points: 2 }
+                        ]
+                    },
+                    {
+                        question: "Name something kids do before bed",
+                        answers: [
+                            { text: "Brush teeth", points: 30 },
+                            { text: "Story time", points: 25 },
+                            { text: "Bath", points: 20 },
+                            { text: "Put on pajamas", points: 10 },
+                            { text: "Say prayers", points: 8 },
+                            { text: "Hug parents", points: 5 },
+                            { text: "Drink water", points: 2 }
+                        ]
+                    }
+                ],
+                round2: [
+                    {
+                        question: "Name something kids do to help at home",
+                        answers: [
+                            { text: "Clean room", points: 60 },
+                            { text: "Set table", points: 50 },
+                            { text: "Feed pet", points: 40 },
+                            { text: "Take out trash", points: 20 },
+                            { text: "Make bed", points: 16 },
+                            { text: "Wash dishes", points: 10 },
+                            { text: "Fold clothes", points: 4 }
+                        ]
+                    },
+                    {
+                        question: "Name something kids do on weekends",
+                        answers: [
+                            { text: "Play outside", points: 60 },
+                            { text: "Visit friends", points: 50 },
+                            { text: "Watch movies", points: 40 },
+                            { text: "Sleep in", points: 20 },
+                            { text: "Sports", points: 16 },
+                            { text: "Go shopping", points: 10 },
+                            { text: "Video games", points: 4 }
+                        ]
+                    },
+                    {
+                        question: "Name something kids do when they're sick",
+                        answers: [
+                            { text: "Stay in bed", points: 60 },
+                            { text: "Watch TV", points: 50 },
+                            { text: "Take medicine", points: 40 },
+                            { text: "Sleep", points: 20 },
+                            { text: "Drink soup", points: 16 },
+                            { text: "Call mom", points: 10 },
+                            { text: "Miss school", points: 4 }
+                        ]
+                    }
+                ],
+                round3: [
+                    {
+                        question: "Name something kids do when they're happy",
+                        answers: [
+                            { text: "Clap hands", points: 100 },
+                            { text: "High five", points: 80 },
+                            { text: "Dance", points: 60 },
+                            { text: "Laugh", points: 30 },
+                            { text: "Smile", points: 20 },
+                            { text: "Jump", points: 8 },
+                            { text: "Sing", points: 2 }
+                        ]
+                    },
+                    {
+                        question: "Name something kids do when they're bored",
+                        answers: [
+                            { text: "Count ceiling tiles", points: 100 },
+                            { text: "Doodle", points: 80 },
+                            { text: "Daydream", points: 60 },
+                            { text: "Ask for snacks", points: 30 },
+                            { text: "Complain", points: 20 },
+                            { text: "Play", points: 8 },
+                            { text: "Watch TV", points: 2 }
+                        ]
+                    },
+                    {
+                        question: "Name something kids do on a rainy day",
+                        answers: [
+                            { text: "Make paper boats", points: 100 },
+                            { text: "Watch raindrops race", points: 80 },
+                            { text: "Build forts", points: 60 },
+                            { text: "Draw", points: 30 },
+                            { text: "Read books", points: 20 },
+                            { text: "Watch TV", points: 8 },
+                            { text: "Play games", points: 2 }
+                        ]
+                    }
+                ]
+            }
+        };
+
+        // Game state
+        let state = {
+            category: "",
+            round: 1,
+            question: 0,
+            teamATurn: true,
+            teamAScore: 0,
+            teamBScore: 0,
+            errors: 0,
+            revealedAnswers: [],
+            currentQuestionData: null,
+            roundQuestions: []
+        };
+
+        // Functions
+        function selectCategory(category) {
+            state.category = category;
+            showRoundInfo();
+        }
+
+        function showRules() {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('rules-screen').classList.remove('hidden');
+        }
+
+        function backToStart() {
+            document.getElementById('rules-screen').classList.add('hidden');
+            document.getElementById('start-screen').classList.remove('hidden');
+        }
+
+        function showRoundInfo() {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('round-info-screen').classList.remove('hidden');
+            
+            const roundTitle = document.getElementById('round-info-title');
+            const roundContent = document.getElementById('round-info-content');
+            
+            roundTitle.textContent = `Round ${state.round}`;
+            
+            if (state.round === 1) {
+                roundContent.innerHTML = `
+                    <p class="mb-4">In Round 1, the most popular answer gives the most points!</p>
+                    <p class="mb-4">Total points for each question: 100</p>
+                    <p>Each team has 3 tries per question. If all 3 guesses are wrong, the other team gets a chance to steal!</p>
+                `;
+            } else if (state.round === 2) {
+                roundContent.innerHTML = `
+                    <p class="mb-4">In Round 2, the most popular answer gives the most points!</p>
+                    <p class="mb-4">All points are DOUBLED! Total points for each question: 200</p>
+                    <p>Each team has 3 tries per question. If all 3 guesses are wrong, the other team gets a chance to steal!</p>
+                `;
+            } else {
+                roundContent.innerHTML = `
+                    <p class="mb-4">In Round 3, the scoring is REVERSED!</p>
+                    <p class="mb-4">The LEAST popular answer gives the MOST points! Total points for each question: 300</p>
+                    <p>Each team has 3 tries per question. If all 3 guesses are wrong, the other team gets a chance to steal!</p>
+                `;
+            }
+        }
+
+        function startRound() {
+            document.getElementById('round-info-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            
+            // Set up the round questions
+            const roundKey = `round${state.round}`;
+            state.roundQuestions = gameData[state.category][roundKey];
+            state.question = 0;
+            state.errors = 0;
+            state.revealedAnswers = [];
+            
+            // Update UI
+            document.getElementById('current-round').textContent = state.round;
+            updateTeamDisplay();
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            if (state.question >= state.roundQuestions.length) {
+                // End of round
+                if (state.round < 3) {
+                    state.round++;
+                    state.question = 0;
+                    showRoundInfo();
+                } else {
+                    showResults();
+                }
+                return;
+            }
+            
+            state.currentQuestionData = state.roundQuestions[state.question];
+            state.errors = 0;
+            state.revealedAnswers = [];
+            
+            // Update UI
+            document.getElementById('question-text').textContent = state.currentQuestionData.question;
+            document.getElementById('errors-counter').textContent = `Errors: ${state.errors}/3`;
+            updateAnswersDisplay();
+            
+            // Reset input
+            document.getElementById('answer-input').value = '';
+            document.getElementById('answer-input').focus();
+        }
+
+        function updateAnswersDisplay() {
+            const answersContainer = document.getElementById('answers-container');
+            answersContainer.innerHTML = '';
+            
+            state.currentQuestionData.answers.forEach((answer, index) => {
+                const isRevealed = state.revealedAnswers.includes(index);
+                
+                const answerDiv = document.createElement('div');
+                answerDiv.className = `${index === 6 ? 'md:col-span-2' : ''} bg-gray-200 rounded-lg p-4 flex justify-between items-center`;
+                
+                if (isRevealed) {
+                    answerDiv.classList.add('answer-reveal');
+                    answerDiv.classList.add('bg-green-100');
+                }
+                
+                answerDiv.innerHTML = `
+                    <div class="flex items-center">
+                        <span class="bg-yellow-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-3">${index + 1}</span>
+                        <span class="answer-text">${isRevealed ? answer.text : '?????'}</span>
+                    </div>
+                    <span class="points-text font-bold">${isRevealed ? answer.points : '??'}</span>
+                `;
+                
+                answersContainer.appendChild(answerDiv);
+            });
+        }
+
+        function updateTeamDisplay() {
+            document.getElementById('team-a-score').textContent = state.teamAScore;
+            document.getElementById('team-b-score').textContent = state.teamBScore;
+            
+            const currentTeamDisplay = document.getElementById('current-team');
+            if (state.teamATurn) {
+                currentTeamDisplay.textContent = "Team A's Turn";
+                currentTeamDisplay.className = "bg-blue-500 text-white px-4 py-2 rounded-lg font-bold";
+            } else {
+                currentTeamDisplay.textContent = "Team B's Turn";
+                currentTeamDisplay.className = "bg-pink-500 text-white px-4 py-2 rounded-lg font-bold";
+            }
+        }
+
+        function submitAnswer() {
+            const answerInput = document.getElementById('answer-input');
+            const userAnswer = answerInput.value.trim().toLowerCase();
+            
+            if (!userAnswer) return;
+            
+            // Check if answer is correct
+            let found = false;
+            let answerIndex = -1;
+            
+            state.currentQuestionData.answers.forEach((answer, index) => {
+                if (answer.text.toLowerCase() === userAnswer && !state.revealedAnswers.includes(index)) {
+                    found = true;
+                    answerIndex = index;
+                }
+            });
+            
+            if (found) {
+                // Correct answer
+                state.revealedAnswers.push(answerIndex);
+                
+                // Add points to current team
+                if (state.teamATurn) {
+                    state.teamAScore += state.currentQuestionData.answers[answerIndex].points;
+                    document.getElementById('team-a-score').classList.add('score-update');
+                    setTimeout(() => {
+                        document.getElementById('team-a-score').classList.remove('score-update');
+                    }, 500);
+                } else {
+                    state.teamBScore += state.currentQuestionData.answers[answerIndex].points;
+                    document.getElementById('team-b-score').classList.add('score-update');
+                    setTimeout(() => {
+                        document.getElementById('team-b-score').classList.remove('score-update');
+                    }, 500);
+                }
+                
+                // Update UI
+                updateAnswersDisplay();
+                updateTeamDisplay();
+                
+                // Clear input
+                answerInput.value = '';
+                answerInput.focus();
+                
+                // Check if all answers are revealed
+                if (state.revealedAnswers.length === state.currentQuestionData.answers.length) {
+                    // Move to next question
+                    setTimeout(() => {
+                        state.question++;
+                        loadQuestion();
+                    }, 1500);
+                }
+                
+                // Show visual feedback
+                const submitButton = document.getElementById('submit-button');
+                submitButton.classList.add('correct-answer');
+                setTimeout(() => {
+                    submitButton.classList.remove('correct-answer');
+                }, 500);
+            } else {
+                // Wrong answer
+                state.errors++;
+                document.getElementById('errors-counter').textContent = `Errors: ${state.errors}/3`;
+                
+                // Show visual feedback
+                const submitButton = document.getElementById('submit-button');
+                submitButton.classList.add('wrong-answer');
+                setTimeout(() => {
+                    submitButton.classList.remove('wrong-answer');
+                }, 500);
+                
+                // Clear input
+                answerInput.value = '';
+                answerInput.focus();
+                
+                // Check if max errors reached
+                if (state.errors >= 3) {
+                    // Switch teams
+                    state.teamATurn = !state.teamATurn;
+                    updateTeamDisplay();
+                }
+            }
+        }
+
+        function switchTeam() {
+            state.teamATurn = !state.teamATurn;
+            state.errors = 0;
+            document.getElementById('errors-counter').textContent = `Errors: ${state.errors}/3`;
+            updateTeamDisplay();
+        }
+
+        function nextQuestion() {
+            state.question++;
+            loadQuestion();
+        }
+
+        function showAllAnswers() {
+            state.revealedAnswers = state.currentQuestionData.answers.map((_, index) => index);
+            updateAnswersDisplay();
+        }
+
+        function showResults() {
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('results-screen').classList.remove('hidden');
+            
+            document.getElementById('final-score-a').textContent = state.teamAScore;
+            document.getElementById('final-score-b').textContent = state.teamBScore;
+            
+            const winnerAnnouncement = document.getElementById('winner-announcement');
+            if (state.teamAScore > state.teamBScore) {
+                winnerAnnouncement.textContent = "Team A wins! 🎉";
+                winnerAnnouncement.className = "text-center text-2xl font-bold mb-8 text-blue-600";
+            } else if (state.teamBScore > state.teamAScore) {
+                winnerAnnouncement.textContent = "Team B wins! 🎉";
+                winnerAnnouncement.className = "text-center text-2xl font-bold mb-8 text-pink-600";
+            } else {
+                winnerAnnouncement.textContent = "It's a tie! Both teams win! 🎉";
+                winnerAnnouncement.className = "text-center text-2xl font-bold mb-8 text-purple-600";
+            }
+        }
+
+        function restartGame() {
+            // Reset game state
+            state = {
+                category: "",
+                round: 1,
+                question: 0,
+                teamATurn: true,
+                teamAScore: 0,
+                teamBScore: 0,
+                errors: 0,
+                revealedAnswers: [],
+                currentQuestionData: null,
+                roundQuestions: []
+            };
+            
+            // Go back to start screen
+            document.getElementById('results-screen').classList.add('hidden');
+            document.getElementById('start-screen').classList.remove('hidden');
+        }
+
+        // Event listener for Enter key on input
+        document.getElementById('answer-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                submitAnswer();
+            }
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'950207dc76ea0d38',t:'MTc0OTk5MDEyMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

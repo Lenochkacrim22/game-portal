@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Minecraft Tic-Tac-Toe • English A1</title>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+    * {margin:0;padding:0;box-sizing:border-box;}
+    body {
+        font-family:'Press Start 2P',cursive;
+        min-height:100vh;
+        color:white;
+        text-shadow:2px 2px 0 #000;
+        transition:all 0.8s;
+    }
+
+    /* Светлая тема */
+    body.day {
+        background: url('https://media.istockphoto.com/id/1305302109/ru/%D0%B2%D0%B5%D0%BA%D1%82%D0%BE%D1%80%D0%BD%D0%B0%D1%8F/%D0%BF%D0%B8%D0%BA%D1%81%D0%B5%D0%BB%D1%8C-minecraft-%D1%81%D1%82%D0%B8%D0%BB%D1%8C-%D0%B7%D0%B5%D0%BC%D0%BB%D0%B8-%D1%84%D0%BE%D0%BD-%D0%BA%D0%BE%D0%BD%D1%86%D0%B5%D0%BF%D1%86%D0%B8%D1%8F-%D0%B8%D0%B3%D1%80%D1%8B-%D0%BD%D0%B0%D0%B7%D0%B5%D0%BC%D0%BD%D0%BE%D0%B3%D0%BE-%D0%BF%D0%B8%D0%BA%D1%81%D0%B5%D0%BB%D0%B8%D0%B7%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%BD%D0%BE%D0%B3%D0%BE.jpg?s=170667a&w=0&k=20&c=P3uyhOei34jbq-HnT9yKXLRfFXBlO2aZoiNIATuFnVw=') fixed center/cover;
+        image-rendering:pixelated;
+    }
+
+    /* Тёмная тема (ночь) */
+    body.night {
+        background: url('https://sotni.ru/wp-content/uploads/2023/08/mainkraft-noch-s-sheiderami-6.webp') fixed center/cover;
+        image-rendering: pixelated;
+        filter: brightness(0.9) contrast(1.2);
+    }
+
+    .wrap {padding:1vh 2vw;max-width:1000px;margin:0 auto;text-align:center;}
+
+    h1 {font-size:5vw;line-height:1.2;margin:1vh 0;}
+    @media (min-width:768px) {h1{font-size:2.5rem;}}
+
+    .setup {
+        background:rgba(0,0,0,0.8);
+        padding:2vh 3vw;
+        border-radius:15px;
+        display:inline-block;
+        border:8px solid #000;
+        border-image:url('https://i.imgur.com/3i5k2j.png') 8 fill;
+        max-height:80vh;
+        overflow-y:auto;
+    }
+
+    select, button {
+        font-family:inherit;
+        width:90%;
+        max-width:400px;
+        margin:8px auto;
+        padding:12px;
+        font-size:4vw;
+        background:#8B4513;
+        color:white;
+        border:4px solid #A0522D;
+        border-radius:10px;
+        display:block;
+        cursor:pointer;
+    }
+    @media (min-width:768px) {
+        select,button{
+            font-size:1.2rem;
+            padding:14px;
+            margin:10px auto;
+        }
+    }
+
+    /* Яркий текст в модальных окнах */
+    #gameArea {
+        display:none;
+        margin-top:2vh;
+        height:calc(100vh - 200px);
+        overflow-y:auto;
+        padding:10px;
+    }
+
+    #status {
+        font-size:4vw;
+        margin:1vh 0;
+        color: #fff;
+        text-shadow: 2px 2px 0 #000, 0 0 10px #0f0;
+    }
+    @media (min-width:768px) {#status{font-size:1.5rem;}}
+
+    #score {
+        font-size:3.5vw;
+        margin:1vh 0;
+        background:rgba(0,0,0,0.5);
+        color: #0f0;
+        text-shadow: 0 0 10px #0f0, 2px 2px 0 #000;
+        padding:8px;
+        border-radius:10px;
+        display:inline-block;
+        font-weight: bold;
+    }
+    @media (min-width:768px) {#score{font-size:1.3rem;}}
+
+    #board {
+        display:grid;
+        grid-template-columns:repeat(3,1fr);
+        gap:6px;
+        width:min(90vw,450px);
+        margin:0 auto;
+        overflow:hidden;
+        image-rendering:pixelated;
+    }
+
+    .cell {
+        background:#8B7355;
+        border:6px solid #A0522D;
+        width:100%;
+        height:100px;
+        position:relative;
+        display:flex;
+        flex-direction:column;
+        justify-content:center;
+        align-items:center;
+        border-radius:10px;
+        cursor:pointer;
+        transition:filter 0.2s;
+        box-sizing:border-box;
+        image-rendering:pixelated;
+        font-size:40px;
+        line-height:1;
+        text-align:center;
+        color:#fff;
+        font-weight:bold;
+    }
+    /* Номер ячейки — всегда светлый */
+    .cell::before {
+        content: attr(data-index-nr);
+        position:absolute;
+        top:4px;
+        right:4px;
+        font-size:14px;
+        color:#0f0;
+        text-shadow: 1px 1px 0 #000;
+        font-weight: bold;
+    }
+    @media (min-width:768px) {
+        .cell{
+            height:120px;
+            font-size:60px;
+            border:8px solid #A0522D;
+        }
+        .cell::before {font-size:18px;}
+    }
+    .cell:hover,.cell:active {filter:brightness(1.5);}
+
+    #quizModal {
+        position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.97);
+        display:none;
+        align-items:center;
+        justify-content:center;
+        padding:10px;
+        z-index:100;
+        flex-direction:column;
+    }
+    .quizBox {
+        background:#5D4037;
+        padding:20px 15px;
+        border:8px solid #8B4513;
+        border-radius:15px;
+        width:95%;
+        max-width:500px;
+        max-height:85vh;
+        overflow-y:auto;
+        text-align:center;
+    }
+    #question {
+        font-size:4vw;
+        margin-bottom:20px;
+        line-height:1.5;
+        color: #0f0;
+        text-shadow: 2px 2px 0 #000, 0 0 10px #0f0;
+    }
+    @media (min-width:768px) {#question{font-size:1.5rem;}}
+    .answerBtn {
+        width:90%;
+        margin:12px auto;
+        padding:16px;
+        font-size:4vw;
+        background:#43A047;
+        color: white;
+        border:4px solid #2E7D32;
+        border-radius:10px;
+        cursor:pointer;
+        text-shadow: 1px 1px 0 #000;
+    }
+    @media (min-width:768px) {.answerBtn{font-size:1.3rem;}}
+    .wrong {background:#E53935 !important;}
+
+    canvas {position:fixed;top:0;left:0;pointer-events:none;z-index:99;}
+</style>
+</head>
+<body class="day">
+
+<div class="wrap">
+    <h1>MINECRAFT<br>TIC-TAC-TOE</h1>
+
+    <div id="setup" class="setup">
+        <p style="font-size:3vw;margin-bottom:15px;">Learn Present Simple by playing!</p>
+        Mode: <select id="mode"><option value="pvp">Two Players</option><option value="ai">Against Computer</option></select><br>
+        Theme: <select id="theme"><option value="day">Day</option><option value="night">Night</option></select><br>
+        Icons: <select id="icons">
+            <option value="classic">X / O</option>
+            <option value="boys">⚔️ / 🛡️</option>
+            <option value="girls">😺 / 🐹</option>
+        </select><br><br>
+        <button onclick="startGame()">PLAY!</button>
+    </div>
+
+    <div id="gameArea">
+        <div id="score">Player 1: 0  Player 2: 0  Draws: 0</div>
+        <div id="status">Player 1's Turn</div>
+        <div id="board"></div><br>
+        <button onclick="reset()">New Game</button>
+        <button onclick="backToMenu()" style="background:#555;">Back to Menu</button>
+    </div>
+</div>
+
+<div id="quizModal">
+    <div class="quizBox">
+        <h2 id="question"></h2>
+        <button class="answerBtn" onclick="check('A')"></button>
+        <button class="answerBtn" onclick="check('B')"></button>
+        <button class="answerBtn" onclick="check('C')"></button>
+        <p id="feedback" style="font-size:5vw;margin-top:20px;"></p>
+    </div>
+</div>
+
+<canvas id="confetti"></canvas>
+
+<script>
+// === Исправленные грамматически правильные вопросы ===
+const quiz = [
+    {q:"My cat always ______ on my bed.", a:"B", o:["sleep","sleeps","sleepes"]},
+    {q:"I often ______ in the park.", a:"A", o:["play","plays","plaies"]},
+    {q:"Tom sometimes ______ pizza.", a:"B", o:["eat","eats","eates"]},
+    {q:"We never ______ coffee.", a:"A", o:["drink","drinks","drinkes"]},
+    {q:"Ann usually ______ to school.", a:"B", o:["walk","walks","walkes"]},
+    {q:"Dad always ______ dinner.", a:"B", o:["cook","cooks","cookes"]},
+    {q:"You often ______ TV.", a:"A", o:["watch","watches","watchs"]},
+    {q:"My sister ______ books every night.", a:"B", o:["read","reads","reades"]},
+    {q:"I ______ up at seven every morning.", a:"A", o:["get","gets","gettes"]},
+    {q:"We ______ to school every day.", a:"A", o:["go","goes","gos"]},
+    {q:"Mum ______ milk twice a week.", a:"B", o:["buy","buys","buies"]},
+    {q:"Tom ______ football three times a week.", a:"B", o:["play","plays","plaies"]},
+    {q:"Our family ______ pizza every Friday.", a:"B", o:["eat","eats","eates"]},
+    {q:"I ______ my room once a week.", a:"A", o:["clean","cleans","cleannes"]},
+    {q:"I ______ always happy.", a:"A", o:["am","is","are"]},
+    {q:"My friends ______ usually at school.", a:"C", o:["am","is","are"]},
+    {q:"The sun ______ always hot.", a:"B", o:["am","is","are"]},
+    {q:"Dogs ______ often big.", a:"C", o:["am","is","are"]},
+    {q:"It ______ often cold in winter.", a:"B", o:["am","is","are"]},
+    {q:"You ______ usually at home after school.", a:"C", o:["am","is","are"]},
+    {q:"My teacher ______ always nice.", a:"B", o:["am","is","are"]},
+    {q:"We ______ sometimes tired after sport.", a:"C", o:["am","is","are"]},
+    {q:"Cats ______ always hungry in the morning.", a:"C", o:["am","is","are"]},
+    {q:"I ______ never late.", a:"A", o:["am","is","are"]},
+    {q:"She ______ often happy.", a:"B", o:["am","is","are"]},
+    {q:"The bag ______ usually heavy.", a:"B", o:["am","is","are"]},
+    {q:"They ______ never at home on Sunday.", a:"C", o:["am","is","are"]},
+    {q:"He ______ always at work.", a:"B", o:["am","is","are"]},
+    {q:"We ______ to the cinema once a month.", a:"A", o:["go","goes","gos"]},
+    {q:"Dad ______ the car every weekend.", a:"B", o:["wash","washes","washs"]}
+];
+
+let player='X',mode,theme,icons,board=Array(9).fill(''),active=true,pending=null,used=[];
+let score = {p1:0, p2:0, draw:0};
+let soundEnabled = false;
+let audioContext = null;
+
+// Иконки с улучшенным отображением для Minecraft-стиля
+const sym={
+    classic:{X:'X',O:'O'},
+    boys:{X:'⚔️',O:'🛡️'}, // Меч и щит
+    girls:{X:'😺',O:'🐹'}  // Кот и хомяк
+};
+
+// --- Аудио система (мягкие, тихие звуки) ---
+function initAudio() {
+    if (audioContext) return;
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    soundEnabled = true;
+    playClick();
+}
+
+function playTone(frequency, duration, type='sine', volume=0.03) {
+    if (!soundEnabled || !audioContext) return;
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    oscillator.type = type;
+    oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+    gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(volume, audioContext.currentTime + 0.01);
+    gainNode.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + duration);
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    oscillator.start();
+    oscillator.stop(audioContext.currentTime + duration);
+}
+
+function playClick() {
+    if (!audioContext) initAudio();
+    playTone(600, 0.12, 'sine', 0.02);
+}
+function playSuccess() { playTone(800, 0.2, 'sine', 0.04); }
+function playError() { playTone(500, 0.15, 'sine', 0.025); }
+function applause() { playSuccess(); }
+
+// --- Основные функции игры ---
+
+function startGame(){
+    playClick();
+    mode=document.getElementById('mode').value;
+    theme=document.getElementById('theme').value;
+    icons=document.getElementById('icons').value;
+    document.body.className=theme;
+    document.getElementById('setup').style.display='none';
+    document.getElementById('gameArea').style.display='block';
+    reset();
+}
+
+function backToMenu(){
+    playClick();
+    document.getElementById('gameArea').style.display='none';
+    document.getElementById('setup').style.display='';
+    document.getElementById('board').innerHTML='';
+}
+
+function reset(){
+    playClick();
+    board=Array(9).fill(''); active=true; player='X'; used=[];
+    document.getElementById('status').textContent='Player 1\'s Turn';
+    updateScore();
+    makeBoard();
+}
+
+function updateScore(){
+    document.getElementById('score').textContent=`Player 1: ${score.p1}  Player 2: ${score.p2}  Draws: ${score.draw}`;
+}
+
+function makeBoard(){
+    const b=document.getElementById('board'); b.innerHTML='';
+    for(let i=0;i<9;i++){
+        const c=document.createElement('div');
+        c.className='cell';
+        c.dataset.index=i;
+        c.dataset.indexNr = i+1; // Нумерация: 1-9
+        c.onclick=()=>{playClick(); move(i);};
+        b.appendChild(c);
+    }
+}
+
+function move(i){
+    if(!active || board[i]) return;
+    pending=i;
+    question();
+}
+
+function question(){
+    if(used.length >= quiz.length) used = [];
+    let n;
+    do { n = Math.floor(Math.random() * quiz.length); }
+    while (used.includes(n) && used.length < quiz.length);
+    used.push(n);
+    const q = quiz[n];
+    document.getElementById('question').textContent = q.q;
+    const btns = document.querySelectorAll('.answerBtn');
+    btns.forEach((b,i) => {
+        b.textContent = ['A','B','C'][i] + ') ' + q.o[i];
+        b.classList.remove('wrong');
+        b.disabled = false;
+        b.onclick = () => { playClick(); check(['A','B','C'][i], n); };
+    });
+    document.getElementById('feedback').textContent = '';
+    document.getElementById('quizModal').style.display = 'flex';
+}
+
+function check(ch, qIndex){
+    const correct = quiz[qIndex].a;
+    const feedbackEl = document.getElementById('feedback');
+    const btns = document.querySelectorAll('.answerBtn');
+
+    if(ch === correct){
+        feedbackEl.innerHTML = 'Correct!<br>Go!';
+        feedbackEl.style.color = '#8f8';
+        playSuccess();
+        btns.forEach(b => b.disabled = true);
+        setTimeout(() => {
+            document.getElementById('quizModal').style.display = 'none';
+            place();
+        }, 1300);
+    } else {
+        feedbackEl.textContent = "Let's try again!";
+        feedbackEl.style.color = '#f88';
+        playError();
+        const btnIndex = ch.charCodeAt(0) - 65;
+        btns[btnIndex].classList.add('wrong');
+        setTimeout(() => {
+            question();
+        }, 1200);
+    }
+}
+
+function place(){
+    board[pending]=player;
+    document.querySelector(`.cell[data-index="${pending}"]`).textContent=sym[icons][player];
+    if(win()){
+        applause();
+        document.getElementById('status').innerHTML=`Player ${player==='X'?'1':'2'} Wins!!!`;
+        if(player==='X') score.p1++; else score.p2++;
+        updateScore(); confetti();
+        active=false;
+    }else if(board.every(c=>c)){
+        document.getElementById('status').textContent='Draw!';
+        score.draw++; updateScore();
+        active=false;
+    }else{
+        player=player==='X'?'O':'X';
+        document.getElementById('status').textContent=`Player ${player==='X'?'1':'2'}'s Turn`;
+        if(mode==='ai' && player==='O' && active) setTimeout(ai,1200);
+    }
+}
+
+function ai(){
+    const e=board.map((v,i)=>v===''?i:null).filter(x=>x!==null);
+    pending=e[Math.floor(Math.random()*e.length)];
+    playClick();
+    place();
+}
+
+function win(){
+    const l=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+    return l.some(c=>c.every(i=>board[i]===player));
+}
+
+function confetti(){
+    const c=document.getElementById('confetti'); const ctx=c.getContext('2d');
+    c.width=innerWidth; c.height=innerHeight;
+    const p=[]; const col=['#ff0000','#00ff00','#0000ff','#ffff00','#ff00ff','#00ffff'];
+    for(let i=0;i<280;i++){
+        p.push({x:Math.random()*c.width,y:-40,r:Math.random()*14+10,c:col[Math.floor(Math.random()*col.length)],vy:Math.random()*10+7,vx:Math.random()*10-5});
+    }
+    function a(){
+        ctx.clearRect(0,0,c.width,c.height);
+        let live=false;
+        p.forEach(pp=>{pp.y+=pp.vy; pp.x+=pp.vx; ctx.fillStyle=pp.c; ctx.fillRect(pp.x,pp.y,pp.r,pp.r); if(pp.y<c.height) live=true;});
+        if(live) requestAnimationFrame(a); else c.style.display='none';
+    }
+    c.style.display='block'; a();
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Colour Quest - Interactive Lesson</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #e8f5e8 0%, #d4e6d4 50%, #c8e6c8 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #4a7c59 0%, #6b8e23 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 20px;
+            background: #f8f9fa;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15), 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .nav-btn.story { background: linear-gradient(45deg, #8b4513, #a0522d); color: white; }
+        .nav-btn.exercise1 { background: linear-gradient(45deg, #228b22, #32cd32); color: white; }
+        .nav-btn.exercise2 { background: linear-gradient(45deg, #6b8e23, #9acd32); color: white; }
+        .nav-btn.exercise3 { background: linear-gradient(45deg, #556b2f, #8fbc8f); color: white; }
+        .nav-btn.exercise4 { background: linear-gradient(45deg, #2e8b57, #3cb371); color: white; }
+        .nav-btn.game { background: linear-gradient(45deg, #daa520, #b8860b); color: white; }
+
+        .nav-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.25), 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        .content {
+            padding: 30px;
+            min-height: 500px;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        /* Story Styles */
+        .story-page {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #4a7c59 0%, #6b8e23 100%);
+            color: white;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .story-page.active {
+            display: block;
+        }
+
+        .story-page h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #daa520;
+        }
+
+        .story-page p {
+            font-size: 1.2em;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .story-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .page-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            background: #daa520;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15), 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .page-btn:hover {
+            background: #b8860b;
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2), 0 3px 6px rgba(0,0,0,0.15);
+        }
+
+        .page-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .page-counter {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 15px;
+            font-weight: bold;
+        }
+
+        /* Exercise Styles */
+        .exercise {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .exercise h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .question {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .question h4 {
+            color: #555;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .options {
+            display: grid;
+            gap: 10px;
+        }
+
+        .option {
+            padding: 12px 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .option:hover {
+            border-color: #007bff;
+            background: #f0f8ff;
+        }
+
+        .option.selected {
+            border-color: #007bff;
+            background: #007bff;
+            color: white;
+        }
+
+        .option.correct {
+            border-color: #28a745;
+            background: #28a745;
+            color: white;
+        }
+
+        .option.incorrect {
+            border-color: #dc3545;
+            background: #dc3545;
+            color: white;
+        }
+
+        .check-btn {
+            padding: 12px 30px;
+            background: #228b22;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15), 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .check-btn:hover {
+            background: #32cd32;
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(0,0,0,0.2), 0 3px 8px rgba(0,0,0,0.15);
+        }
+
+        .score {
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #28a745;
+            margin-top: 20px;
+        }
+
+        /* Game Styles */
+        .game-setup {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+        }
+
+        .player-select {
+            margin: 20px 0;
+        }
+
+        .player-btn {
+            padding: 12px 24px;
+            margin: 0 10px;
+            border: 2px solid #228b22;
+            border-radius: 25px;
+            background: white;
+            color: #228b22;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15), 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .player-btn.active {
+            background: #228b22;
+            color: white;
+        }
+
+        .player-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 12px;
+            width: 800px;
+            margin: 20px auto;
+            justify-self: center;
+        }
+
+        .game-cell {
+            aspect-ratio: 1;
+            border: 3px solid #8b4513;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            text-align: center;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-height: 65px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .game-cell:hover {
+            transform: scale(1.08);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .game-cell.start { 
+            background: linear-gradient(135deg, #90ee90, #98fb98); 
+            color: #2e8b57; 
+            border-color: #90ee90;
+        }
+        .game-cell.finish { 
+            background: linear-gradient(135deg, #daa520, #ffd700); 
+            color: #8b4513; 
+            border-color: #daa520;
+            animation: sparkle 2s infinite;
+        }
+        .game-cell.character { 
+            background: linear-gradient(135deg, #8b4513, #a0522d); 
+            color: white; 
+            border-color: #8b4513;
+        }
+        .game-cell.challenge { 
+            background: linear-gradient(135deg, #556b2f, #6b8e23); 
+            color: white; 
+            border-color: #556b2f;
+        }
+        .game-cell.normal { 
+            background: linear-gradient(135deg, #228b22, #32cd32); 
+            color: white; 
+            border-color: #228b22;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .player-piece {
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: 3px solid white;
+            z-index: 10;
+            transition: all 0.5s ease;
+            top: 5px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .player-piece.active {
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 0 40px rgba(255, 215, 0, 0.6), 0 2px 8px rgba(0,0,0,0.2);
+            animation: glow 2s infinite alternate;
+        }
+
+        @keyframes glow {
+            0% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 0 40px rgba(255, 215, 0, 0.6), 0 2px 8px rgba(0,0,0,0.2); }
+            100% { box-shadow: 0 0 30px rgba(255, 215, 0, 1), 0 0 60px rgba(255, 215, 0, 0.8), 0 2px 8px rgba(0,0,0,0.2); }
+        }
+
+        .fireworks {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .firework {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            animation: firework 1.5s ease-out forwards;
+        }
+
+        @keyframes firework {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(20);
+                opacity: 0;
+            }
+        }
+
+        .player1 {
+            background: linear-gradient(135deg, #8b4513, #a0522d);
+            left: 5px;
+        }
+
+        .player2 {
+            background: linear-gradient(135deg, #228b22, #32cd32);
+            right: 5px;
+        }
+
+        .current-player {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .dice-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .dice {
+            width: 65px;
+            height: 65px;
+            border: 3px solid #8b4513;
+            border-radius: 15px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #fff, #f5f5dc);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .dice:hover {
+            transform: rotate(10deg) scale(1.1);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+        }
+
+        .roll-btn {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #8b4513, #a0522d);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .roll-btn:hover {
+            background: linear-gradient(135deg, #a0522d, #cd853f);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+        }
+
+        .question-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .modal-content h3 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .modal-options {
+            display: grid;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .modal-option {
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-option:hover {
+            border-color: #007bff;
+            background: #f0f8ff;
+        }
+
+        @media (max-width: 768px) {
+            .nav-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .nav-btn {
+                width: 200px;
+            }
+            
+            .game-board {
+                grid-template-columns: repeat(5, 1fr);
+                max-width: 400px;
+            }
+            
+            .story-controls {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .game-cell {
+                font-size: 12px;
+                min-height: 50px;
+            }
+            
+            .player-piece {
+                width: 20px;
+                height: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌈 The Colour Quest</h1>
+            <p>Interactive English Lesson for Young Learners</p>
+        </div>
+
+        <div class="nav-buttons">
+            <button class="nav-btn story" onclick="showSection('story')">📖 Read Story</button>
+            <button class="nav-btn exercise1" onclick="showSection('exercise1')">🎯 Characters & Colors</button>
+            <button class="nav-btn exercise2" onclick="showSection('exercise2')">🗺️ Story Places</button>
+            <button class="nav-btn exercise3" onclick="showSection('exercise3')">⚡ Actions & Events</button>
+            <button class="nav-btn exercise4" onclick="showSection('exercise4')">🧩 Story Understanding</button>
+            <button class="nav-btn game" onclick="showSection('game')">🎲 Adventure Game</button>
+        </div>
+
+        <div class="content">
+            <!-- Story Section -->
+            <div id="story" class="section active">
+                <div class="story-page active" data-page="1">
+                    <h2>🌈 The Beginning</h2>
+                    <p>In Rainbow Forest, something is wrong. The colours are fading. The trees are grey, the sky is pale, and the flowers are white. Everything feels sleepy and sad.</p>
+                    <p>One quiet morning, Bluejay Bella flies over the trees. She sees something strange — a soft light in the air. It is a rainbow butterfly! 🦋 Her wings shine with red, blue, yellow, black and white.</p>
+                </div>
+
+                <div class="story-page" data-page="2">
+                    <h2>🦋 The Rainbow Butterfly</h2>
+                    <p>The butterfly lands on a leaf. The animal friends come close — Bella, Ruby, Sunny, and Shadow.</p>
+                    <p>"The colours are leaving the forest," says the butterfly. "But there is hope. Far away, in the Garden of Light, sleeps the Magic Colour Crystal. Only true colours can wake it up."</p>
+                    <p>"How do we find it?" asks Bella.</p>
+                    <p>"You must work together," says the butterfly. "Each of you has a special colour. Use your power, help each other, and follow the path."</p>
+                </div>
+
+                <div class="story-page" data-page="3">
+                    <h2>🚀 The Adventure Begins</h2>
+                    <p>Then the butterfly disappears in a flash of rainbow light. The animals look at each other. They smile.</p>
+                    <p>"Let's go!" says Ruby.</p>
+                    <p>"Yes! We can do it!" says Sunny.</p>
+                    <p>"For Rainbow Forest!" says Bella.</p>
+                    <p>Shadow nods. "Together."</p>
+                    <p>And so, their adventure begins...</p>
+                </div>
+
+                <div class="story-page" data-page="4">
+                    <h2>🐦‍⬛ Bella at the River</h2>
+                    <p>Bella flies high in the sky. She is calm and smart. "Blue helps me relax and think," she says. The first stop is the River of Mist. The water is fast and loud.</p>
+                    <p>"Oh no!" cries Ruby. "We can't cross!"</p>
+                    <p>Bella closes her eyes, breathes slowly, and listens. She sees a safe path across some big stones. "Follow me!" she calls. They all jump from stone to stone. Thanks to Bella's calm mind, they cross the river safely.</p>
+                </div>
+
+                <div class="story-page" data-page="5">
+                    <h2>🦊 Ruby in the Desert</h2>
+                    <p>Next is the Hot Desert of Echoes. The sun is bright. The ground is dry. Everyone is tired.</p>
+                    <p>"I feel sleepy!" says Sunny.</p>
+                    <p>"Me too!" says Shadow.</p>
+                    <p>But Ruby runs ahead. "Let's go!" she shouts. "Red gives me energy!" She jumps, rolls, and finds a cool cave to rest. Her power makes the team smile again. "We can do it!" they say.</p>
+                </div>
+
+                <div class="story-page" data-page="6">
+                    <h2>🦜 Sunny in the Tunnel</h2>
+                    <p>Then they reach a Dark Tunnel under the hills. It is cold and scary. They can't see anything.</p>
+                    <p>"I don't like this," says Ruby. "It's too dark!"</p>
+                    <p>But Sunny flies up and spins in the air. Her yellow feathers glow like a lamp. "Yellow gives me light and joy!" she says. She sings a happy tune. The tunnel lights up with colour. Now they can see the way!</p>
+                </div>
+
+                <div class="story-page" data-page="7">
+                    <h2>🐼 Shadow in the Mountains</h2>
+                    <p>At last, they come to the High Cloudy Mountains. The wind is strong, and the path is narrow. Everyone is nervous.</p>
+                    <p>But Shadow stands tall. "Black gives me courage. White helps me feel light." He takes slow, strong steps. He shows the way. The others follow him carefully. Together, they reach the top.</p>
+                </div>
+
+                <div class="story-page" data-page="8">
+                    <h2>✨ The Magic Crystal</h2>
+                    <p>Finally, they arrive at the Garden of Light. In the middle stands the Magic Colour Crystal — but it is grey and still.</p>
+                    <p>"What do we do now?" asks Bella.</p>
+                    <p>"We use our colours — together!" says Sunny.</p>
+                    <p>Bella sings a soft blue song. Ruby jumps and spins in red circles. Sunny dances and shines yellow light. Shadow holds the crystal and glows black and white.</p>
+                </div>
+
+                <div class="story-page" data-page="9">
+                    <h2>🌈 Happy Ending</h2>
+                    <p>The crystal starts to shine! Colours fly into the sky! The forest is bright again. Flowers bloom, the river sparkles, and the trees turn green.</p>
+                    <p>The rainbow butterfly returns. "You did it," she says. "You bring colour back — with your hearts."</p>
+                    <p>The animals cheer. Now, Rainbow Forest is full of life again — because of teamwork, kindness, and the magic of colours.</p>
+                    <p><strong>The End. 🌟</strong></p>
+                </div>
+
+                <div class="story-controls">
+                    <button class="page-btn" id="prevBtn" onclick="changePage(-1)">← Previous</button>
+                    <div class="page-counter">
+                        Page <span id="currentPage">1</span> of <span id="totalPages">9</span>
+                    </div>
+                    <button class="page-btn" id="nextBtn" onclick="changePage(1)">Next →</button>
+                </div>
+            </div>
+
+            <!-- Exercise 1: Characters & Colors -->
+            <div id="exercise1" class="section">
+                <div class="exercise">
+                    <h3>🎯 Exercise 1: Characters & Colors</h3>
+                    
+                    <div class="question">
+                        <h4>1. What color is Bella?</h4>
+                        <div class="options">
+                            <div class="option" data-answer="correct">Blue</div>
+                            <div class="option" data-answer="wrong">Red</div>
+                            <div class="option" data-answer="wrong">Yellow</div>
+                        </div>
+                    </div>
+
+                    <div class="question">
+                        <h4>2. Which animal is Ruby?</h4>
+                        <div class="options">
+                            <div class="option" data-answer="wrong">Bird</div>
+                            <div class="option" data-answer="correct">Fox</div>
+                            <div class="option" data-answer="wrong">Panda</div>
+                        </div>
+                    </div>
+
+                    <div class="question">
+                        <h4>3. What does yellow give to Sunny?</h4>
+                        <div class="options">
+                            <div class="option" data-answer="wrong">Energy</div>
+                            <div class="option" data-answer="correct">Light and joy</div>
+                            <div class="option" data-answer="wrong">Courage</div>
+                        </div>
+                    </div>
+
+                    <div class="question">
+                        <h4>4. Shadow is a...</h4>
+                        <div class="options">
+                            <div class="option" data-answer="wrong">Fox</div>
+                            <div class="option" data-answer="wrong">Parrot</div>
+                            <div class="option" data-answer="correct">Panda</div>
+                        </div>
+                    </div>
+
+                    <div class="question">
+                        <h4>5. How many colors does the rainbow butterfly have?</h4>
+                        <div class="options">
+                            <div class="option" data-answer="wrong">Three</div>
+                            <div class="option" data-answer="wrong">Four</div>
+                            <div class="option" data-answer="correct">Five</div>
+                        </div>
+                    </div>
+
+                    <button class="check-btn" onclick="checkExercise(1)">Check Answers</button>
+                    <div class="score" id="score1"></div>
+                </div>
+            </div>
+
+            <!-- Exercise 2: Story Places -->
+            <div id="exercise2" class="section">
+                <div class="exercise">
+                    <h3>🗺️ Exercise 2: Story Places</h3>
+                    
+                    <div class="question">
+                        <h4>1. Where do the animals live?</h4>
+                        <div class="options">
+                            <div class="option" data-answer="correct">Rainbow Forest</div>
+                            <div class="option" data-answer="wrong">Magic Garden</div>
+                            <div class="option" data-answer="wrong">Color Mountain</div>
+                        </div>
+                    </div>
+
+                    <div class="question">
+                        <h4>2. What is the first place they visit?</h4>
+                        <div class="options">
+                            <div class="option" data-answer="wrong">Hot Desert</div>
+                            <div class="option" data-answer="correct">River of Mist</div>
+                            <div class="option" data-answer="wrong">Dark Tunnel</div>
+                        </div>
+                    </div>
+
+                    <div class="question">
+                        <h4>3. Where does Ruby help the team?</h4>
+                        <div class="options">
+                            <div class="option" data-answer="wrong">River of Mist</div>
+                            <div class="option" data-answer="correct">Hot Desert of Echoes</div>
+                            <div class="option" data-answer="wrong">Garden of Light</div>
+                        </div>
+                    </div>
+
+                    <div class="question">
+                        <h4>4. Where is the Magic Crystal?</h4>
+                        <div class="options">
+                            <div class="option" data-answer="wrong">Rainbow Forest</div>
+                            <div class="option" data-answer="wrong">Dark Tunnel</div>
+                            <div class="option" data-answer="correct">Garden of Light</div>
+                        </div>
+                    </div>
+
+                    <div class="question">
+                        <h4>5. What is under the hills?</h4>
+                        <div class="options">
+                            <div class="option" data-answer="correct">Dark Tunnel</div>
+                            <div class="option" data-answer="wrong">Magic Crystal</div>
+                            <div class="option" data-answer="wrong">Cool Cave</div>
+                        </div>
+                    </div>
+
+                    <button class="check-btn" onclick="checkExercise(2)">Check Answers</button>
+                    <div class="score" id="score2"></div>
+                </div>
+            </div>
+
+            <!-- Exercise 3: Actions & Events -->
+            <div id="exercise3" class="section">
+                <div class="exercise">
+                    <h3>⚡ Exercise 3: Actions & Events</h3>
+                    
+                    <div class="question">
+                        <h4>1. How do they cross the river?</h4>
+                        <div class="options">
+                            <div class="option" data-answer="wrong">They swim</div>
+                            <div class="option" data-answer="correct">They jump on stones</div>
+                            <div class="option" data-answer="wrong">They fly</div>
+                        </div>
+                    </div>
+
+                    <div class="question">
+                        <h4>2. What does Sunny do in the dark tunnel?</h4>
+                        <div class="options">
+                            <div class="option" data-answer="wrong">She runs fast</div>
+                            <div class="option" data-answer="correct">She glows and sings</div>
+                            <div class="option" data-answer="wrong">She finds a cave</div>
+                        </div>
+                    </div>
+
+                    <div class="question">
+                        <h4>3. What happens to the crystal at the end?</h4>
+                        <div class="options">
+                            <div class="option" data-answer="wrong">It breaks</div>
+                            <div class="option" data-answer="correct">It shines with colors</div>
+                            <div class="option" data-answer="wrong">It disappears</div>
+                        </div>
+                    </div>
+
+                    <div class="question">
+                        <h4>4. What does Ruby find in the desert?</h4>
+                        <div class="options">
+                            <div class="option" data-answer="correct">A cool cave</div>
+                            <div class="option" data-answer="wrong">Water</div>
+                            <div class="option" data-answer="wrong">The crystal</div>
+                        </div>
+                    </div>
+
+                    <div class="question">
+                        <h4>5. How does the butterfly disappear?</h4>
+                        <div class="options">
+                            <div class="option" data-answer="wrong">Slowly</div>
+                            <div class="option" data-answer="correct">In a flash of rainbow light</div>
+                            <div class="option" data-answer="wrong">Behind a tree</div>
+                        </div>
+                    </div>
+
+                    <button class="check-btn" onclick="checkExercise(3)">Check Answers</button>
+                    <div class="score" id="score3"></div>
+                </div>
+            </div>
+
+            <!-- Exercise 4: Story Understanding -->
+            <div id="exercise4" class="section">
+                <div class="exercise">
+                    <h3>🧩 Exercise 4: Story Understanding</h3>
+                    
+                    <div class="question">
+                        <h4>1. Why is Rainbow Forest sad at the beginning?</h4>
+                        <div class="options">
+                            <div class="option" data-answer="wrong">It's raining</div>
+                            <div class="option" data-answer="correct">The colors are fading</div>
+                            <div class="option" data-answer="wrong">The animals are sleeping</div>
+                        </div>
+                    </div>
+
+                    <div class="question">
+                        <h4>2. What do the animals need to wake up the crystal?</h4>
+                        <div class="options">
+                            <div class="option" data-answer="wrong">Magic words</div>
+                            <div class="option" data-answer="correct">True colors working together</div>
+                            <div class="option" data-answer="wrong">A special song</div>
+                        </div>
+                    </div>
+
+                    <div class="question">
+                        <h4>3. What is the main message of the story?</h4>
+                        <div class="options">
+                            <div class="option" data-answer="wrong">Colors are beautiful</div>
+                            <div class="option" data-answer="correct">Teamwork and friendship are important</div>
+                            <div class="option" data-answer="wrong">Magic is real</div>
+                        </div>
+                    </div>
+
+                    <div class="question">
+                        <h4>4. Who helps the animals find the crystal?</h4>
+                        <div class="options">
+                            <div class="option" data-answer="correct">The rainbow butterfly</div>
+                            <div class="option" data-answer="wrong">A wise owl</div>
+                            <div class="option" data-answer="wrong">A magic tree</div>
+                        </div>
+                    </div>
+
+                    <div class="question">
+                        <h4>5. How does the story end?</h4>
+                        <div class="options">
+                            <div class="option" data-answer="wrong">The animals go home</div>
+                            <div class="option" data-answer="correct">The forest becomes colorful again</div>
+                            <div class="option" data-answer="wrong">They find more crystals</div>
+                        </div>
+                    </div>
+
+                    <button class="check-btn" onclick="checkExercise(4)">Check Answers</button>
+                    <div class="score" id="score4"></div>
+                </div>
+            </div>
+
+            <!-- Game Section -->
+            <div id="game" class="section">
+                <h2 style="text-align: center; color: #333; margin-bottom: 20px;">🎲 Rainbow Forest Adventure Game</h2>
+                
+                <div class="game-setup">
+                    <h3>Choose Number of Players</h3>
+                    <div class="player-select">
+                        <button class="player-btn active" onclick="setPlayers(1)">1 Player</button>
+                        <button class="player-btn" onclick="setPlayers(2)">2 Players</button>
+                    </div>
+                    <button class="roll-btn" onclick="startGame()" id="startBtn">Start Game</button>
+                </div>
+
+                <div id="gameArea" style="display: none;">
+                    <div class="current-player" id="currentPlayerDisplay">
+                        Player 1's Turn
+                    </div>
+                    
+                    <div class="dice-container">
+                        <div class="dice" id="dice">?</div>
+                        <button class="roll-btn" onclick="rollDice()" id="rollBtn">Roll Dice</button>
+                        <button class="roll-btn" onclick="resetGame()" style="background: linear-gradient(135deg, #d4a5d4, #e6b3ff); margin-left: 20px;">🔄 Reset Game</button>
+                    </div>
+
+                    <div class="game-board" id="gameBoard">
+                        <!-- Game board will be generated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Question Modal -->
+    <div class="question-modal" id="questionModal">
+        <div class="modal-content">
+            <h3 id="modalQuestion">Question will appear here</h3>
+            <div class="modal-options" id="modalOptions">
+                <!-- Options will be generated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStoryPage = 1;
+        const totalStoryPages = 9;
+        let numberOfPlayers = 1;
+        let currentPlayer = 1;
+        let player1Position = 1;
+        let player2Position = 1;
+        let diceValue = 1;
+        let gameStarted = false;
+
+        // Game questions for board game
+        const gameQuestions = [
+            {
+                question: "What animal is Bella?",
+                options: ["Fox", "Bird", "Panda", "Rabbit"],
+                correct: 1
+            },
+            {
+                question: "What color is Ruby?",
+                options: ["Blue", "Red", "Yellow", "Green"],
+                correct: 1
+            },
+            {
+                question: "Where do they cross first?",
+                options: ["River of Mist", "Hot Desert", "Dark Tunnel", "High Mountains"],
+                correct: 0
+            },
+            {
+                question: "What does Sunny bring to the tunnel?",
+                options: ["Energy", "Light", "Courage", "Water"],
+                correct: 1
+            },
+            {
+                question: "Who helps in the mountains?",
+                options: ["Bella", "Ruby", "Shadow", "Sunny"],
+                correct: 2
+            },
+            {
+                question: "What are the trees like at the beginning?",
+                options: ["Green", "Grey", "Brown", "Yellow"],
+                correct: 1
+            },
+            {
+                question: "How many friends go on the adventure?",
+                options: ["Three", "Four", "Five", "Six"],
+                correct: 1
+            },
+            {
+                question: "What gives Ruby energy?",
+                options: ["Blue", "Red", "Yellow", "Black"],
+                correct: 1
+            },
+            {
+                question: "Where is the Magic Crystal?",
+                options: ["Forest", "Garden of Light", "Mountain", "Desert"],
+                correct: 1
+            },
+            {
+                question: "What happens at the end?",
+                options: ["Forest stays grey", "Colors come back", "Animals leave", "Crystal breaks"],
+                correct: 1
+            },
+            {
+                question: "What animal is Shadow?",
+                options: ["Bird", "Fox", "Panda", "Cat"],
+                correct: 2
+            },
+            {
+                question: "What does blue help Bella do?",
+                options: ["Run fast", "Think calmly", "Sing loudly", "Jump high"],
+                correct: 1
+            },
+            {
+                question: "What do they find in the desert?",
+                options: ["Water", "Cool cave", "Magic stone", "Butterfly"],
+                correct: 1
+            },
+            {
+                question: "How does the butterfly appear?",
+                options: ["Flying slowly", "In rainbow light", "From a tree", "In the water"],
+                correct: 1
+            },
+            {
+                question: "What color is Sunny?",
+                options: ["Red", "Blue", "Yellow", "Green"],
+                correct: 2
+            },
+            {
+                question: "What makes the forest sad?",
+                options: ["Rain", "Darkness", "Fading colors", "Cold weather"],
+                correct: 2
+            },
+            {
+                question: "How do they cross the river?",
+                options: ["Swimming", "Flying", "Jumping on stones", "Using a boat"],
+                correct: 2
+            },
+            {
+                question: "What does Shadow's black color give him?",
+                options: ["Speed", "Courage", "Light", "Joy"],
+                correct: 1
+            },
+            {
+                question: "Where does the butterfly tell them to go?",
+                options: ["Magic Mountain", "Garden of Light", "Crystal Cave", "Rainbow Valley"],
+                correct: 1
+            },
+            {
+                question: "What happens when they reach the crystal?",
+                options: ["It breaks", "It stays grey", "They sing together", "It disappears"],
+                correct: 2
+            },
+            {
+                question: "What does white help Shadow feel?",
+                options: ["Heavy", "Light", "Sad", "Angry"],
+                correct: 1
+            },
+            {
+                question: "How many colors does the butterfly mention?",
+                options: ["Four", "Five", "Six", "Seven"],
+                correct: 1
+            },
+            {
+                question: "What do the flowers look like at the start?",
+                options: ["Red", "Blue", "White", "Yellow"],
+                correct: 2
+            },
+            {
+                question: "Who finds the path across the river?",
+                options: ["Ruby", "Bella", "Sunny", "Shadow"],
+                correct: 1
+            },
+            {
+                question: "What does Sunny do to light up the tunnel?",
+                options: ["Runs fast", "Spins and glows", "Shouts loudly", "Jumps high"],
+                correct: 1
+            }
+        ];
+
+        let usedQuestions = [];
+        let availableQuestions = [...gameQuestions];
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            updateStoryControls();
+            createGameBoard();
+        });
+
+        function showSection(sectionId) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => section.classList.remove('active'));
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+        }
+
+        function changePage(direction) {
+            const newPage = currentStoryPage + direction;
+            if (newPage >= 1 && newPage <= totalStoryPages) {
+                // Hide current page
+                document.querySelector(`.story-page[data-page="${currentStoryPage}"]`).classList.remove('active');
+                
+                // Show new page
+                currentStoryPage = newPage;
+                document.querySelector(`.story-page[data-page="${currentStoryPage}"]`).classList.add('active');
+                
+                updateStoryControls();
+            }
+        }
+
+        function updateStoryControls() {
+            document.getElementById('currentPage').textContent = currentStoryPage;
+            document.getElementById('totalPages').textContent = totalStoryPages;
+            
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            prevBtn.disabled = currentStoryPage === 1;
+            nextBtn.disabled = currentStoryPage === totalStoryPages;
+        }
+
+        function checkExercise(exerciseNum) {
+            const exercise = document.getElementById(`exercise${exerciseNum}`);
+            const questions = exercise.querySelectorAll('.question');
+            let correct = 0;
+            let total = questions.length;
+
+            questions.forEach(question => {
+                const options = question.querySelectorAll('.option');
+                const selectedOption = question.querySelector('.option.selected');
+                
+                options.forEach(option => {
+                    if (option.dataset.answer === 'correct') {
+                        option.classList.add('correct');
+                    } else if (option.classList.contains('selected')) {
+                        option.classList.add('incorrect');
+                    }
+                });
+
+                if (selectedOption && selectedOption.dataset.answer === 'correct') {
+                    correct++;
+                }
+            });
+
+            const scoreElement = document.getElementById(`score${exerciseNum}`);
+            scoreElement.textContent = `Score: ${correct}/${total} (${Math.round(correct/total*100)}%)`;
+        }
+
+        // Add click handlers for exercise options
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('option')) {
+                const question = e.target.closest('.question');
+                const options = question.querySelectorAll('.option');
+                
+                // Remove previous selections
+                options.forEach(opt => opt.classList.remove('selected'));
+                
+                // Add selection to clicked option
+                e.target.classList.add('selected');
+            }
+        });
+
+        // Game functions
+        function setPlayers(num) {
+            numberOfPlayers = num;
+            document.querySelectorAll('.player-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function startGame() {
+            gameStarted = true;
+            document.querySelector('.game-setup').style.display = 'none';
+            document.getElementById('gameArea').style.display = 'block';
+            
+            player1Position = 1;
+            player2Position = 1;
+            currentPlayer = 1;
+            usedQuestions = [];
+            availableQuestions = [...gameQuestions];
+            
+            updateCurrentPlayerDisplay();
+            createGameBoard();
+        }
+
+        function resetGame() {
+            gameStarted = false;
+            document.querySelector('.game-setup').style.display = 'block';
+            document.getElementById('gameArea').style.display = 'none';
+            
+            player1Position = 1;
+            player2Position = 1;
+            currentPlayer = 1;
+            usedQuestions = [];
+            availableQuestions = [...gameQuestions];
+            document.getElementById('dice').textContent = '?';
+            document.getElementById('rollBtn').disabled = false;
+        }
+
+        function updateCurrentPlayerDisplay() {
+            const display = document.getElementById('currentPlayerDisplay');
+            if (numberOfPlayers === 1) {
+                display.textContent = `Position: ${player1Position}`;
+            } else {
+                display.textContent = `Player ${currentPlayer}'s Turn (Position: ${currentPlayer === 1 ? player1Position : player2Position})`;
+            }
+        }
+
+        function createGameBoard() {
+            const board = document.getElementById('gameBoard');
+            board.innerHTML = '';
+            
+            const boardLayout = [
+                {type: 'start', text: 'START 🏠'},
+                {type: 'normal', text: '2'},
+                {type: 'normal', text: '3'},
+                {type: 'normal', text: '4'},
+                {type: 'normal', text: '5'},
+                {type: 'normal', text: '6'},
+                {type: 'normal', text: '7'},
+                {type: 'normal', text: '8'},
+                {type: 'normal', text: '9'},
+                {type: 'normal', text: '10'},
+                {type: 'normal', text: '11'},
+                {type: 'normal', text: '12'},
+                {type: 'normal', text: '13'},
+                {type: 'normal', text: '14'},
+                {type: 'normal', text: '15'},
+                {type: 'normal', text: '16'},
+                {type: 'normal', text: '17'},
+                {type: 'normal', text: '18'},
+                {type: 'normal', text: '19'},
+                {type: 'finish', text: 'CRYSTAL ✨'}
+            ];
+
+            boardLayout.forEach((cell, index) => {
+                const cellElement = document.createElement('div');
+                cellElement.className = `game-cell ${cell.type}`;
+                cellElement.textContent = cell.text;
+                cellElement.dataset.position = index + 1;
+                
+                // Add player pieces
+                if (index + 1 === player1Position) {
+                    const player1Piece = document.createElement('div');
+                    player1Piece.className = `player-piece player1 ${currentPlayer === 1 ? 'active' : ''}`;
+                    player1Piece.textContent = '😊';
+                    cellElement.appendChild(player1Piece);
+                }
+                
+                if (numberOfPlayers === 2 && index + 1 === player2Position) {
+                    const player2Piece = document.createElement('div');
+                    player2Piece.className = `player-piece player2 ${currentPlayer === 2 ? 'active' : ''}`;
+                    player2Piece.textContent = '😄';
+                    cellElement.appendChild(player2Piece);
+                }
+                
+                board.appendChild(cellElement);
+            });
+        }
+
+        function rollDice() {
+            diceValue = Math.floor(Math.random() * 6) + 1;
+            document.getElementById('dice').textContent = diceValue;
+            document.getElementById('rollBtn').disabled = true;
+            
+            setTimeout(() => {
+                movePlayer();
+            }, 500);
+        }
+
+        function movePlayer() {
+            let currentPosition = currentPlayer === 1 ? player1Position : player2Position;
+            let newPosition = Math.min(currentPosition + diceValue, 20);
+            
+            if (currentPlayer === 1) {
+                player1Position = newPosition;
+            } else {
+                player2Position = newPosition;
+            }
+            
+            updateCurrentPlayerDisplay();
+            createGameBoard();
+            
+            // Always show question after moving
+            showGameQuestion();
+        }
+
+        function showGameQuestion() {
+            // If no questions left, refill the pool
+            if (availableQuestions.length === 0) {
+                availableQuestions = [...gameQuestions];
+                usedQuestions = [];
+            }
+            
+            // Pick a random question from available ones
+            const randomIndex = Math.floor(Math.random() * availableQuestions.length);
+            const selectedQuestion = availableQuestions[randomIndex];
+            
+            // Move question from available to used
+            availableQuestions.splice(randomIndex, 1);
+            usedQuestions.push(selectedQuestion);
+            
+            const modal = document.getElementById('questionModal');
+            const questionElement = document.getElementById('modalQuestion');
+            const optionsElement = document.getElementById('modalOptions');
+            
+            questionElement.textContent = selectedQuestion.question;
+            optionsElement.innerHTML = '';
+            
+            selectedQuestion.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'modal-option';
+                optionElement.textContent = option;
+                optionElement.onclick = () => answerGameQuestion(index, selectedQuestion.correct);
+                optionsElement.appendChild(optionElement);
+            });
+            
+            modal.style.display = 'block';
+        }
+
+        function createFireworks() {
+            const fireworksContainer = document.createElement('div');
+            fireworksContainer.className = 'fireworks';
+            document.body.appendChild(fireworksContainer);
+
+            const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3', '#54a0ff'];
+            
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const firework = document.createElement('div');
+                    firework.className = 'firework';
+                    firework.style.left = Math.random() * 100 + '%';
+                    firework.style.top = Math.random() * 100 + '%';
+                    firework.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    fireworksContainer.appendChild(firework);
+                    
+                    setTimeout(() => {
+                        firework.remove();
+                    }, 1500);
+                }, i * 100);
+            }
+            
+            setTimeout(() => {
+                fireworksContainer.remove();
+            }, 8000);
+        }
+
+        function answerGameQuestion(selectedIndex, correctIndex) {
+            const modal = document.getElementById('questionModal');
+            
+            if (selectedIndex === correctIndex) {
+                alert('✅ Correct! Move forward!');
+                
+                // Move forward by dice value (already moved in movePlayer)
+                // Check if current player won
+                let currentPosition = currentPlayer === 1 ? player1Position : player2Position;
+                if (currentPosition === 20) {
+                    createFireworks();
+                    setTimeout(() => {
+                        if (numberOfPlayers === 1) {
+                            alert('🎉 Congratulations! You helped the animals reach the Magic Crystal and saved Rainbow Forest!');
+                        } else {
+                            alert(`🎉 Congratulations Player ${currentPlayer}! You helped the animals reach the Magic Crystal and saved Rainbow Forest!`);
+                        }
+                    }, 500);
+                } else {
+                    // Switch to next player
+                    if (numberOfPlayers === 2) {
+                        currentPlayer = currentPlayer === 1 ? 2 : 1;
+                        updateCurrentPlayerDisplay();
+                    }
+                }
+            } else {
+                alert('❌ Wrong answer! Move back by dice value.');
+                
+                // Move current player back by dice value
+                if (currentPlayer === 1) {
+                    player1Position = Math.max(1, player1Position - diceValue);
+                } else {
+                    player2Position = Math.max(1, player2Position - diceValue);
+                }
+                
+                updateCurrentPlayerDisplay();
+                createGameBoard();
+                
+                // Switch to next player
+                if (numberOfPlayers === 2) {
+                    currentPlayer = currentPlayer === 1 ? 2 : 1;
+                    updateCurrentPlayerDisplay();
+                }
+            }
+            
+            modal.style.display = 'none';
+            document.getElementById('rollBtn').disabled = false;
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('questionModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.style.display = 'none';
+            }
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'95e8b3ed031dec3b',t:'MTc1MjQwODg5NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
